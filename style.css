@@ -1,103 +1,135 @@
-/* Основные стили */
-body {
-    font-family: 'Arial', sans-serif;
-    margin: 0;
-    padding: 0;
-    transition: background-color 0.3s ease;
-    min-height: 100vh;
+:root {
+  --primary-color: #6c5ce7;
+  --secondary-color: #a29bfe;
+  --text-color: #ffffff;
+  --bg-color: #1a1a2e;
+  --progress-bg: #4a4a6a;
+  --progress-color: #6c5ce7;
 }
 
-body.dark {
-    background-color: #121212;
-    color: #ffffff;
+/* Темы */
+[data-theme="light"] {
+  --text-color: #333333;
+  --bg-color: #f8f9fa;
+  --primary-color: #6c5ce7;
+  --secondary-color: #a29bfe;
+  --progress-bg: #e0e0e0;
+  --progress-color: #6c5ce7;
 }
 
-body.light {
-    background-color: #ffffff;
-    color: #333333;
+canvas {
+  transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.6s ease-in-out;
+  opacity: 0;
+  transform: scale(0.95);
 }
 
-.container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    min-height: 100vh;
+canvas.loaded {
+  opacity: 1;
+  transform: scale(1);
 }
-
-h1 {
-    color: inherit;
-    text-align: center;
-    margin-bottom: 20px;
-}
-
-.controls {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    width: 100%;
-    max-width: 800px;
-    margin-bottom: 20px;
-}
-
-.control-group {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-    justify-content: center;
-}
-
 button {
-    padding: 8px 16px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    background-color: #4a6fa5;
-    color: white;
-    font-size: 14px;
-    transition: background-color 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform, opacity;
 }
 
 button:hover {
-    background-color: #3a5a8f;
+  transform: scale(1.02);
 }
 
 button:active {
-    background-color: #2a4a7a;
+  transform: scale(0.98);
 }
 
-button.theme-toggle {
-    background-color: #f0ad4e;
+input[type="range"]::-webkit-slider-thumb {
+  transition: transform 0.3s ease-in-out;
 }
-
-button.theme-toggle:hover {
-    background-color: #ec971f;
-}
-
-.slider-group {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    width: 100%;
-}
-
-label {
-    font-size: 14px;
-    color: inherit;
 }
 
 input[type="range"] {
-    width: 100%;
-    margin: 5px 0;
+  width: 100%;
+  margin: 8px 0;
 }
 
-select {
-    padding: 8px;
-    border-radius: 4px;
-    border: 1px solid #ccc;
-    background-color: white;
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  background-color: var(--accent-color);
+  border-radius: 50%;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s ease;
+}
+
+input[type="range"]::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 6px;
+  background: var(--secondary-color);
+  border-radius: var(--border-radius);
+  transition: background-color 0.3s ease;
+}
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.modal-content h3 {
+  margin-top: 0;
+  color: var(--primary-color);
+}
+
+.progress-container {
+  width: 100%;
+  height: 10px;
+  background-color: var(--progress-bg);
+  border-radius: 5px;
+  margin: 15px 0;
+}
+
+.progress-bar {
+  height: 100%;
+  background-color: var(--progress-color);
+  border-radius: 5px;
+  transition: width 0.3s ease;
+}
+
+/* Анимация кнопки экспорта */
+#export-btn {
+  cursor: pointer;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.export-button-animating {
+  transform: scale(0.95);
+  opacity: 0.8;
+}
+
+/* Кнопки и элементы управления */
+button {
+  background-color: var(--primary-color);
+  color: var(--text-color);
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background-color 0.2s ease;
+}
+
+button:hover {
+  background-color: var(--secondary-color);
+}
+
+button:disabled {
+  background-color: #666666;
+  cursor: not-allowed;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .modal-content {
+    padding: 15px;
+    max-width: 90%;
+  }
+}
     color: inherit;
     width: 100%;
     max-width: 200px;
@@ -175,23 +207,35 @@ select.dark {
     opacity: 1;
 }
 
-@media (max-width: 768px) {
-    .container {
-        padding: 10px;
-    }
-    h1 {
-        font-size: 24px;
-    }
-    .controls {
-        margin-bottom: 15px;
-    }
-    button {
-        padding: 6px 12px;
-        font-size: 12px;
-    }
-    .slider-group {
-        flex-direction: column;
-        align-items: stretch;
+.export-complete {
+  opacity: 0;
+  transform: translateY(10px);
+  animation: fadeInUp 0.5s ease-out forwards;
+}
+
+@keyframes fadeInUp {
+  to { opacity: 1; transform: translateY(0); }
+}
+  to { opacity: 1; transform: translateY(0); }
+@media (max-width: 1200px) {
+  canvas {
+    transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.8s ease-in-out;
+  }
+
+  .controls input[type="range"] {
+    height: 10px;
+    padding: 8px 0;
+  }
+
+  .export-complete {
+    font-size: 14px;
+    padding: 8px;
+  }
+
+  button {
+    padding: 0.75rem 1.5rem;
+  }
+}
     }
     select {
         max-width: 100%;
@@ -205,9 +249,12 @@ select.dark {
 @media (max-width: 480px) {
     .control-group {
         flex-direction: column;
-    }
-    button {
-        width: 100%;
-        margin-bottom: 8px;
-    }
+.format-hint {
+    font-size: 0.8em;
+    opacity: 0;
+    color: var(--text-color);
+    text-align: center;
+    width: 100%;
+    margin-bottom: 10px;
+    transition: opacity 0.3s ease;
 }

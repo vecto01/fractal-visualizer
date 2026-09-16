@@ -28,12 +28,20 @@ document.addEventListener('DOMContentLoaded', function() {
   clickArea.className = 'click-area';
   document.body.appendChild(clickArea);
 
-  // Fractal parameters
-  let iterations = 50;
-  let zoom = 1;
-  let offsetX = 0;
-  let offsetY = 0;
+// Fractal parameters
+let iterations = 50;
+let zoom = 1;
+let offsetX = 0;
+let offsetY = 0;
 
+// Настройки для режима "Кинетическая живопись"
+let paintingModeSettings = {
+    colorPalette: 'Plasma',
+    frequencyResponse: 0.5,
+    amplitudeResponse: 0.3,
+    baseColor: '#ff00ff',
+    animationSpeed: 0.05,
+};
   // Check for saved theme preference
   const savedTheme = localStorage.getItem('theme');
   const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -71,21 +79,33 @@ document.addEventListener('DOMContentLoaded', function() {
       for (let x = 0; x < width; x++) {
         const real = scale * (x - centerX) / centerX + offsetX;
         const imag = scale * (y - centerY) / centerY + offsetY;
-        const color = mandelbrot(real, imag, iterations);
-        ctx.fillStyle = color;
-        ctx.fillRect(x, y, 1, 1);
-      }
-    }
-  }
-
-  // Mandelbrot algorithm
-  function mandelbrot(real, imag, maxIterations) {
+// Mandelbrot algorithm
+function mandelbrot(real, imag, maxIterations) {
     let x = 0;
     let y = 0;
     let iter = 0;
+    
+    // Динамическое изменение параметров под звук
+    const hue = iter / maxIterations * 360;
+    
     while (x * x + y * y < 4 && iter < maxIterations) {
-      const xtemp = x * x - y * y + real;
-      y = 2 * x * y + imag;
+        const xtemp = x * x - y * y + real;
+        y = 2 * x * y + imag;
+        x = xtemp;
+        iter++;
+    }
+    
+    if (iter === maxIterations) return '#000000';
+    
+    // Используем настройки из режима живописи
+    const paletteHue = hue * paintingModeSettings.frequencyResponse;
+    const paletteSaturation = 100;
+    const paletteLightness = 50 + (iter / maxIterations) * 20;
+    
+    // Динамический цвет на основе звука
+    const dynamicHue = (paletteHue + iter * paintingModeSettings.animationSpeed) % 360;
+    return `hsl(${dynamicHue}, ${paletteSaturation}%, ${paletteLightness}%)`;
+}
       x = xtemp;
       iter++;
     }
@@ -207,7 +227,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
   function hideLoading() {
     loadingOverlay.classList.add('hidden');
-    document.body.style.cursor = '';
+// Обновление настроек фрактала из режима живописи
+function updateFractalFromPaintingMode(settings) {
+    paintingModeSettings = settings;
+    drawFractal();
+}
+
+// Инициализация режима живописи
+const paintingMode = PaintingMode.init();
+paintingMode.setFractalCallback(updateFractalFromPaintingMode);
     document.body.style.overflow = 'auto';
   }
 
@@ -244,7 +272,20 @@ document.addEventListener('DOMContentLoaded', function() {
     initCanvas();
     updateFractalBackground();
   });
-
+// Инициализация кнопки режима живописи
+const paintingModeBtn = document.getElementById('paintingModeBtn');
+paintingModeBtn.textContent = 'Кинетическая живопись (Вкл)';
+paintingModeBtn.addEventListener('click', function() {
+    if (paintingModeBtn.textContent.includes('Вкл')) {
+        paintingModeBtn.textContent = 'Кинетическая живопись (Выкл)';
+        paintingMode.start();
+        paintingMode.startAnimation();
+    } else {
+        paintingModeBtn.textContent = 'Кинетическая живопись (Вкл)';
+        paintingMode.stop();
+        paintingMode.stopAnimation();
+    }
+});
   // Touch events for mobile
   canvas.addEventListener('wheel', function(e) {
     e.preventDefault();

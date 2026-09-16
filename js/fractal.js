@@ -9,15 +9,30 @@ document.addEventListener('DOMContentLoaded', function() {
   const iterationsSlider = document.getElementById('iterations');
   const zoomSlider = document.getElementById('zoom');
   const themeToggle = document.getElementById('themeToggle');
-  const controlsPanel = document.querySelector('.controls-panel');
+  const controlsPanel = document.getElementById('controlsPanel');
   const footer = document.querySelector('.footer');
+  const loadingComplete = document.getElementById('loadingComplete');
+  const iterationsValue = document.getElementById('iterations-value');
+  const zoomValue = document.getElementById('zoom-value');
+  const loadingProgressBar = document.createElement('div');
+  loadingProgressBar.className = 'loading-progress-bar';
+
+  // Добавляем прогресс-бар
+  const loadingProgress = document.createElement('div');
+  loadingProgress.className = 'loading-progress';
+  loadingProgress.appendChild(loadingProgressBar);
+  loadingOverlay.appendChild(loadingProgress);
+
+  // Кликабельная зона
+  const clickArea = document.createElement('div');
+  clickArea.className = 'click-area';
+  document.body.appendChild(clickArea);
 
   // Fractal parameters
   let iterations = 50;
   let zoom = 1;
   let offsetX = 0;
   let offsetY = 0;
-  let isAnimating = false;
 
   // Check for saved theme preference
   const savedTheme = localStorage.getItem('theme');
@@ -87,17 +102,17 @@ document.addEventListener('DOMContentLoaded', function() {
     zoom = 1;
     iterationsSlider.value = 50;
     zoomSlider.value = 1;
+    fractalContainer.classList.remove('zoom-low', 'zoom-high');
     drawFractal();
     saveSettings();
     animateReset();
   });
 
   function animateReset() {
-    const originalOpacity = 1;
     fractalContainer.style.opacity = '0.5';
     setTimeout(() => {
       drawFractal();
-      fractalContainer.style.opacity = originalOpacity;
+      fractalContainer.style.opacity = '1';
     }, 300);
   }
 
@@ -105,20 +120,31 @@ document.addEventListener('DOMContentLoaded', function() {
     const colors = ['hsl(120, 100%, 50%)', 'hsl(240, 100%, 50%)', 'hsl(0, 100%, 50%)', 'hsl(300, 100%, 50%)'];
     const randomColor = colors[Math.floor(Math.random() * colors.length)];
     alert(`Current color scheme: ${randomColor}`);
-    // TODO: Implement actual color scheme change
   });
 
   iterationsSlider.addEventListener('input', function() {
     iterations = parseInt(this.value);
+    iterationsValue.textContent = iterations;
     drawFractal();
     saveSettings();
   });
 
   zoomSlider.addEventListener('input', function() {
     zoom = parseFloat(this.value);
+    zoomValue.textContent = zoom.toFixed(1);
     drawFractal();
     saveSettings();
+    updateFractalBackground();
   });
+
+  function updateFractalBackground() {
+    fractalContainer.classList.remove('zoom-low', 'zoom-high');
+    if (zoom < 0.5) {
+      fractalContainer.classList.add('zoom-low');
+    } else {
+      fractalContainer.classList.add('zoom-high');
+    }
+  }
 
   // Mouse and touch events for zooming
   canvas.addEventListener('mousedown', startDrag);
@@ -172,15 +198,29 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Loading overlay
   function showLoading() {
-    loadingOverlay.classList.add('show');
     loadingOverlay.classList.remove('hidden');
     document.body.style.cursor = 'wait';
+    loadingProgressBar.style.animation = 'progress 2s linear forwards';
+    clickArea.classList.remove('active');
+    document.body.style.overflow = 'hidden';
   }
 
   function hideLoading() {
-    loadingOverlay.classList.remove('show');
     loadingOverlay.classList.add('hidden');
     document.body.style.cursor = '';
+    document.body.style.overflow = 'auto';
+  }
+
+  // Show loading complete message
+  function showLoadingComplete() {
+    loadingComplete.style.display = 'block';
+    setTimeout(() => {
+      loadingComplete.style.animation = 'fadeOut 1s ease-out forwards';
+      setTimeout(() => {
+        loadingComplete.style.display = 'none';
+        clickArea.classList.add('active');
+      }, 1000);
+    }, 1500);
   }
 
   // Initialize with animations
@@ -191,9 +231,8 @@ document.addEventListener('DOMContentLoaded', function() {
       hideLoading();
       controlsPanel.classList.add('fade-in');
       footer.classList.add('fade-in');
-      setTimeout(() => {
-        document.body.style.overflow = 'auto';
-      }, 500);
+      updateFractalBackground();
+      showLoadingComplete();
     }, 1000);
   }
 
@@ -203,6 +242,7 @@ document.addEventListener('DOMContentLoaded', function() {
   // Resize handler
   window.addEventListener('resize', function() {
     initCanvas();
+    updateFractalBackground();
   });
 
   // Touch events for mobile
@@ -213,6 +253,7 @@ document.addEventListener('DOMContentLoaded', function() {
     zoomSlider.value = zoom;
     drawFractal();
     saveSettings();
+    updateFractalBackground();
   });
 
   // Keyboard navigation
@@ -229,6 +270,37 @@ document.addEventListener('DOMContentLoaded', function() {
     } else if (e.key === 'ArrowRight') {
       offsetX += 0.01;
       drawFractal();
+    }
+  });
+
+  // Mobile menu toggle
+  document.getElementById('menuToggle').addEventListener('click', function() {
+    controlsPanel.classList.toggle('active');
+  });
+
+  // Кликабельная зона для взаимодействия
+  clickArea.addEventListener('click', function() {
+    alert('Tap to explore the fractal!');
+  });
+
+  // Smooth scroll
+  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function(e) {
+      e.preventDefault();
+      const target = document.querySelector(this.getAttribute('href'));
+      if (target) {
+        target.scrollIntoView({
+          behavior: 'smooth'
+        });
+      }
+    });
+  });
+
+  // Прокрутка вниз
+  window.addEventListener('scroll', function() {
+    const scrollPosition = window.pageYOffset;
+    if (scrollPosition > 100) {
+      clickArea.classList.remove('active');
     }
   });
 });

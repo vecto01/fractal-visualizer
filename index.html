@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Интерактивная визуализация фракталов</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>Фрактал: Множество Мандельброта</h1>
+        <div class="theme-toggle">
+            <button id="theme-toggle">Тёмная тема</button>
+        </div>
+    </header>
+    <main>
+        <div class="canvas-container">
+            <canvas id="fractal-canvas"></canvas>
+        </div>
+        <div class="controls">
+            <div class="control-group">
+                <label for="iterations">Итерации:</label>
+                <input type="range" id="iterations" min="10" max="200" value="100">
+                <span id="iterations-value">100</span>
+            </div>
+            <div class="control-group">
+                <label for="zoom">Масштаб:</label>
+                <input type="range" id="zoom" min="0.1" max="2" step="0.1" value="1">
+            </div>
+            <div class="control-group">
+                <label for="color-scheme">Цветовая схема:</label>
+                <select id="color-scheme">
+                    <option value="rainbow">Радужная</option>
+                    <option value="black-white">Чёрно-белая</option>
+                </select>
+            </div>
+            <button id="export-btn">Экспортировать</button>
+        </div>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>

@@ -4,125 +4,373 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fractal Visualizer</title>
+:root {
+    --primary-color: #2d3748;
+    --secondary-color: #4a5568;
+    --accent-color: #63b3ed;
+    --text-color: #ffffff;
+    --border-radius: 8px;
+    --transition-speed: 0.3s;
+    --hover-scale: 1.05;
+    --focus-outline: 2px solid var(--accent-color);
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--primary-color);
+    color: var(--text-color);
+    transition: background-color var(--transition-speed) ease;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    text-align: center;
+}
+
+.fractal-container {
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+}
+
+canvas {
+    background-color: var(--primary-color);
+    border-radius: var(--border-radius);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    display: block;
+    margin-bottom: 20px;
+    width: 100%;
+    max-width: 90%;
+    height: auto;
+    min-height: 300px;
+    transition: transform var(--transition-speed) ease;
+}
+
+.controls {
+    background-color: rgba(45, 55, 72, 0.9);
+    padding: 15px;
+    border-radius: var(--border-radius);
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    overflow-y: auto;
+    max-height: 80vh;
+}
+
+.control-row {
+    margin-bottom: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 14px;
+    color: var(--text-color);
+}
+
+input, select, button {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #4a5568;
+    border-radius: var(--border-radius);
+    background-color: var(--secondary-color);
+    color: var(--text-color);
+    transition: all var(--transition-speed) ease;
+}
+
+input:focus, select:focus, button:focus {
+    border-color: var(--accent-color);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(99, 179, 237, 0.2);
+}
+
+button {
+    background-color: var(--accent-color);
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all var(--transition-speed) ease;
+    will-change: transform;
+}
+
+button:hover {
+    background-color: #519fdf;
+    transform: scale(var(--hover-scale));
+}
+
+button:active {
+    transform: scale(0.98);
+}
+
+.palette-selector {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.palette-option {
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/gif.js@0.2.0/dist/gif.js"></script>
     <style>
-        :root {
-            --primary-color: #2d3748;
-            --secondary-color: #4a5568;
-            --accent-color: #63b3ed;
-            --text-color: #ffffff;
-        }
-        body {
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--primary-color);
-            color: var(--text-color);
-            transition: background-color 0.3s ease;
-        }
-        .container {
-            max-width: 100%;
-            margin: 0 auto;
-            padding: 20px;
-            text-align: center;
-        }
-        .fractal-container {
-            width: 100%;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-        }
-        canvas {
-            background-color: var(--primary-color);
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-            display: block;
-            margin-bottom: 20px;
-            transition: transform 0.3s ease;
-        }
-        .controls {
-            background-color: rgba(45, 55, 72, 0.9);
-            padding: 15px;
-            border-radius: 8px;
-            width: 90%;
-            max-width: 500px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-        }
-        .control-row {
-            margin-bottom: 15px;
-        }
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-size: 14px;
-        }
-        input, select, button {
-            width: 100%;
-            padding: 8px;
-            margin-bottom: 10px;
-            border: 1px solid #4a5568;
-            border-radius: 4px;
-            background-color: var(--secondary-color);
-            color: var(--text-color);
-            transition: border-color 0.2s ease;
-        }
-        input:focus, select:focus, button:focus {
-            border-color: var(--accent-color);
-            outline: none;
-        }
-        button {
+        .export-btn {
             background-color: var(--accent-color);
             border: none;
             cursor: pointer;
             font-weight: bold;
-            transition: all 0.2s ease;
+            transition: all var(--transition-speed) ease;
+            will-change: transform;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
-        button:hover {
+        
+        .export-btn:hover {
             background-color: #519fdf;
             transform: translateY(-2px);
         }
-        button:active {
-            transform: translateY(0);
-        }
-        .palette-selector {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-        .palette-option {
-            padding: 5px 10px;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: transform 0.2s ease;
-            background-color: var(--secondary-color);
-            color: var(--text-color);
-        }
-        .palette-option:hover {
-            transform: scale(1.1);
-        }
-        .palette-option.active {
-            border: 2px solid var(--accent-color);
-        }
-        @media (max-width: 768px) {
-            .controls {
-                width: 95%;
-                padding: 10px;
-            }
-            button {
-                padding: 8px;
-            }
-        }
-        @media (max-width: 480px) {
-            .controls {
-                padding: 8px;
-            }
-            button {
-                padding: 6px;
-            }
-        }
+/* Анимация загрузки */
+@keyframes loadingGradient {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+.loading-spinner {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: clamp(30px, 5vw, 50px);
+    height: clamp(30px, 5vw, 50px);
+    border: 3px solid var(--accent-color);
+    border-radius: 50%;
+    border-top-color: rgba(255, 255, 255, 0.7);
+    animation: loadingGradient 1.5s ease-in-out infinite;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
+    margin: 0 auto 20px;
+    z-index: 10;
+}
+
+/* Адаптивность и контраст */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--primary-color);
+    color: var(--text-color);
+    transition: background-color var(--transition-speed) ease;
+    min-height: 100vh;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    text-align: center;
+    min-height: 100vh;
+}
+
+.fractal-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    max-height: calc(100vh - 40px);
+    overflow-y: auto;
+}
+
+/* Контраст и шрифты */
+label, button, input, select {
+    color: var(--text-color);
+    font-size: 14px;
+    font-weight: 500;
+}
+
+select {
+    background-color: rgba(45, 55, 72, 0.95);
+    color: var(--text-color);
+    padding: 8px;
+    border-radius: var(--border-radius);
+    border: 1px solid #4a5568;
+}
+
+/* Анимации */
+.palette-option {
+    transition: transform 0.5s ease-in-out;
+    transform: scale(1);
+}
+
+.palette-option:hover {
+    transform: scale(1.05);
+}
+
+button {
+    transition: all 0.5s ease-in-out;
+}
+
+button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Экспорт */
+.export-btn {
+    background-color: var(--accent-color);
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all var(--transition-speed) ease;
+    will-change: transform;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px;
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+.export-btn:hover {
+    background-color: #519fdf;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.format-hint {
+    font-size: 0.8em;
+    opacity: 0.7;
+    color: var(--text-color);
+    text-align: center;
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+/* Адаптивность */
+@media (max-width: 1200px) {
+    .controls button, .controls input, .controls select {
+        padding: 10px 12px;
+        font-size: 14px;
+    }
+    .control-row label {
+        font-size: 15px;
+    }
+    input[type="range"] {
+        width: 100%;
+        margin: 10px 0;
+    }
+    .palette-option {
+        min-width: 60px;
+    }
+    .controls button {
+        margin-right: 10px;
+    }
+    .controls button:last-child {
+        margin-right: 0;
+    }
+}
+
+@media (max-width: 1024px) {
+    .controls {
+        width: 95%;
+        padding: 12px;
+    }
+    button {
+        padding: 8px;
+    }
+    .palette-option {
+        min-width: 50px;
+    }
+    .fractal-container {
+        padding-bottom: 20px;
+    }
+}
+
+@media (max-width: 768px) {
+    .controls {
+        width: 98%;
+        padding: 10px;
+    }
+    button {
+        padding: 6px;
+    }
+    .palette-option {
+        min-width: 40px;
+        font-size: 12px;
+    }
+    .controls button {
+        margin-right: 8px;
+    }
+    .controls button:last-child {
+        margin-right: 0;
+    }
+    .fractal-container {
+        max-height: calc(100vh - 80px);
+    }
+}
+
+@media (max-width: 480px) {
+    .controls {
+        padding: 8px;
+    }
+    button {
+        padding: 4px;
+    }
+    .palette-option {
+        min-width: 30px;
+        font-size: 10px;
+    }
+    .fractal-container {
+        max-height: calc(100vh - 60px);
+    }
+}
+        min-width: 50px;
+        font-size: 12px;
+    }
+    .controls button {
+        margin-right: 8px;
+    }
+    .controls button:last-child {
+        margin-right: 0;
+    }
+}
+
+@media (max-width: 480px) {
+    .controls {
+        padding: 8px;
+    }
+    button {
+        padding: 4px;
+    }
+    .palette-option {
+        min-width: 40px;
+        font-size: 10px;
+    }
+    .fractal-container {
+        max-height: calc(100vh - 100px);
+        overflow-y: auto;
+    }
+}
+        font-size: 12px;
+    }
+}
     </style>
 </head>
 <body>

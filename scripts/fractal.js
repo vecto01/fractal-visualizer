@@ -1,173 +1,351 @@
-// ===== Параметры фрактала =====
-const fractalParams = {
-  width: 800,
-  height: 600,
-  maxIterations: 100,
-  zoom: 1,
-  xOffset: 0,
-  yOffset: 0,
-  colorScheme: 'classic',
-  isAnimating: false,
-  animationFrameId: null,
+// Функция для рендеринга фрактала Мандельброта с анимацией
+function renderMandelbrotWithAnimation(canvas, palette, iterations, zoom) {
+    const ctx = canvas.getContext('2d');
+    const width = canvas.width;
+    const height = canvas.height;
+    const centerX = -0.5;
+    const centerY = 0;
+    const xMin = centerX - zoom;
+    const xMax = centerX + zoom;
+    const yMin = centerY - zoom;
+    const yMax = centerY + zoom;
+    
+    // Анимация загрузки
+    const loadingAnimation = () => {
+        const imageData = ctx.createImageData(width, height);
+        const data = imageData.data;
+        
+        for (let y = 0; y < height; y++) {
+            for (let x = 0; x < width; x++) {
+                const progress = (y * width + x) / (width * height);
+                const colorIndex = Math.floor(progress * palette.length);
+                const [r, g, b] = palette[colorIndex];
+                const index = (y * width + x) * 4;
+                data[index] = r * progress;
+                data[index + 1] = g * progress;
+                data[index + 2] = b * progress;
+                data[index + 3] = 255;
+            }
+        }
+        ctx.putImageData(imageData, 0, 0);
+    };
+    
+    // Основной рендеринг
+    const imageData = ctx.createImageData(width, height);
+    const data = imageData.data;
+    
+    // Основной алгоритм рендеринга
+    for (let y = 0; y < height; y++) {
+        for (let x = 0; x < width; x++) {
+            const real = xMin + (x / (width - 1)) * (xMax - xMin);
+            const imag = yMin + (y / (height - 1)) * (yMax - yMin);
+            let zx = 0;
+            let zy = 0;
+            let xi = real;
+            let yi = imag;
+            let iter = 0;
+            
+            while (zx * zx + zy * zy < 4 && iter < iterations) {
+                zx = zx * zx - zy * zy + xi;
+                zy = 2 * zx * zy + yi;
+                iter++;
+            }
+            
+            const index = (y * width + x) * 4;
+            if (iter === iterations) {
+                data[index] = 0;
+                data[index + 1] = 0;
+                data[index + 2] = 0;
+                data[index + 3] = 255;
+            } else {
+                const colorIndex = Math.min(iter, palette.length - 1);
+                const [r, g, b] = palette[colorIndex];
+                data[index] = r;
+                data[index + 1] = g;
+                data[index + 2] = b;
+                data[index + 3] = 255;
+            }
+        }
+    }
+    
+    // Анимация завершения
+    const animateFinish = () => {
+        const imageData = ctx.createImageData(width, height);
+        const data = imageData.data;
+        const finalPalette = palettes[currentPalette];
+        
+        for (let y = 0; y < height; y++) {
+            for (let x = 0; x < width; x++) {
+                const progress = (y * width + x) / (width * height);
+                const colorIndex = Math.floor(progress * finalPalette.length);
+                const [r, g, b] = finalPalette[colorIndex];
+                const index = (y * width + x) * 4;
+                data[index] = r;
+                data[index + 1] = g;
+                data[index + 2] = b;
+                data[index + 3] = 255;
+            }
+        }
+        ctx.putImageData(imageData, 0, 0);
+    };
+    
+    // Анимация загрузки
+    loadingAnimation();
+    ctx.putImageData(imageData, 0, 0);
+    animateFinish();
+}
+
+// Функция для рендеринга фрактала Джулия с анимацией
+function renderJuliaWithAnimation(canvas, palette, iterations, zoom) {
+    const ctx = canvas.getContext('2d');
+    const width = canvas.width;
+    const height = canvas.height;
+    const centerX = -0.7;
+    const centerY = 0.27015;
+    const xMin = -1.5;
+    const xMax = 1.5;
+    const yMin = -1.5;
+    const yMax = 1.5;
+    
+    // Анимация загрузки
+    const loadingAnimation = () => {
+        const imageData = ctx.createImageData(width, height);
+        const data = imageData.data;
+        
+        for (let y = 0; y < height; y++) {
+            for (let x = 0; x < width; x++) {
+                const progress = (y * width + x) / (width * height);
+                const colorIndex = Math.floor(progress * palette.length);
+                const [r, g, b] = palette[colorIndex];
+                const index = (y * width + x) * 4;
+                data[index] = r * progress;
+                data[index + 1] = g * progress;
+                data[index + 2] = b * progress;
+                data[index + 3] = 255;
+            }
+        }
+        ctx.putImageData(imageData, 0, 0);
+    };
+    
+    // Основной рендеринг
+    const imageData = ctx.createImageData(width, height);
+    const data = imageData.data;
+    
+    // Основной алгоритм рендеринга
+    for (let y = 0; y < height; y++) {
+        for (let x = 0; x < width; x++) {
+            const real = xMin + (x / (width - 1)) * (xMax - xMin);
+            const imag = yMin + (y / (height - 1)) * (yMax - yMin);
+            let zx = real;
+            let zy = imag;
+            let cx = centerX;
+            let cy = centerY;
+            let iter = 0;
+            
+            while (zx * zx + zy * zy < 4 && iter < iterations) {
+                const zxTemp = zx * zx - zy * zy + cx;
+                zy = 2 * zx * zy + cy;
+                zx = zxTemp;
+                iter++;
+            }
+            
+            const index = (y * width + x) * 4;
+            if (iter === iterations) {
+                data[index] = 0;
+                data[index + 1] = 0;
+                data[index + 2] = 0;
+                data[index + 3] = 255;
+            } else {
+                const colorIndex = Math.min(iter, palette.length - 1);
+                const [r, g, b] = palette[colorIndex];
+                data[index] = r;
+                data[index + 1] = g;
+                data[index + 2] = b;
+                data[index + 3] = 255;
+            }
+        }
+    }
+    
+    // Анимация завершения
+    const animateFinish = () => {
+        const imageData = ctx.createImageData(width, height);
+        const data = imageData.data;
+        const finalPalette = palettes[currentPalette];
+        
+        for (let y = 0; y < height; y++) {
+            for (let x = 0; x < width; x++) {
+                const progress = (y * width + x) / (width * height);
+                const colorIndex = Math.floor(progress * finalPalette.length);
+                const [r, g, b] = finalPalette[colorIndex];
+                const index = (y * width + x) * 4;
+                data[index] = r;
+                data[index + 1] = g;
+                data[index + 2] = b;
+                data[index + 3] = 255;
+            }
+        }
+        ctx.putImageData(imageData, 0, 0);
+    };
+    
+    // Анимация загрузки
+    loadingAnimation();
+    ctx.putImageData(imageData, 0, 0);
+    animateFinish();
+}
+
+// Палитры
+const palettes = {
+    Plasma: [
+        [255, 0, 0], [255, 127, 0], [255, 255, 0], [0, 255, 0], [0, 0, 255], [75, 0, 130], [143, 0, 255]
+    ],
+    Night: [
+        [0, 0, 0], [0, 0, 100], [0, 100, 200], [100, 100, 255], [200, 200, 255], [255, 255, 255]
+    ],
+    Solar: [
+        [255, 0, 0], [255, 165, 0], [255, 255, 0], [127, 255, 0], [0, 255, 0], [0, 0, 255]
+    ],
+    Ultraviolet: [
+        [147, 112, 219], [100, 149, 237], [135, 206, 235], [173, 216, 230], [230, 230, 250], [255, 255, 255]
+    ],
+    Monochrome: [
+        [0, 0, 0], [50, 50, 50], [100, 100, 100], [150, 150, 150], [200, 200, 200], [255, 255, 255]
+    ],
+    RainbowGradient: [
+        [255, 0, 0], [255, 127, 0], [255, 255, 0], [0, 255, 0], [0, 0, 255], [75, 0, 130], [143, 0, 255], [255, 0, 255]
+    ],
+    EarthTones: [
+        [139, 69, 19], [205, 133, 63], [255, 215, 0], [102, 205, 170], [0, 100, 0], [128, 0, 0]
+    ]
 };
 
-// ===== Элементы DOM =====
-const canvas = document.getElementById('fractal-canvas');
+// Инициализация
+const canvas = document.getElementById('fractalCanvas');
 const ctx = canvas.getContext('2d');
-const loadingElement = document.getElementById('loading');
-const fractalContainer = document.getElementById('fractal-container');
-const iterationsSlider = document.getElementById('iterations');
-const colorSchemeSelect = document.getElementById('color-scheme');
-const exportBtn = document.getElementById('export-btn');
-const themeToggleBtn = document.getElementById('theme-toggle');
+canvas.width = window.innerWidth * 0.8;
+canvas.height = window.innerHeight * 0.6;
 
-// ===== Инициализация канвы =====
-function initCanvas() {
-  canvas.width = fractalParams.width;
-  canvas.height = fractalParams.height;
-  drawFractal();
+// Палитры для выбора
+const paletteSelector = document.getElementById('paletteSelector');
+for (const [name, colors] of Object.entries(palettes)) {
+    const option = document.createElement('div');
+    option.className = 'palette-option';
+    option.textContent = name;
+    option.dataset.palette = name;
+    option.addEventListener('click', () => selectPalette(name));
+    paletteSelector.appendChild(option);
 }
 
-// ===== Рендеринг фрактала =====
-function drawFractal() {
-  const iterations = parseInt(iterationsSlider.value);
-  const colorScheme = colorSchemeSelect.value;
-  const { width, height } = canvas;
+// Выбранная палитра по умолчанию
+let currentPalette = 'Plasma';
+let currentFractal = 'mandelbrot';
+let iterations = 50;
+let zoom = 1;
 
-  // Очистка канвы
-  ctx.clearRect(0, 0, width, height);
-
-  // Логика рендеринга фрактала Мандельброта
-  const centerX = width / 2;
-  const centerY = height / 2;
-
-  for (let x = 0; x < width; x++) {
-    for (let y = 0; y < height; y++) {
-      const real = (x - centerX) / fractalParams.zoom + fractalParams.xOffset;
-      const imag = (y - centerY) / fractalParams.zoom + fractalParams.yOffset;
-
-      let zReal = 0;
-      let zImag = 0;
-      let temp;
-      let iterationsCount = 0;
-
-      while (zReal * zReal + zImag * zImag < 4 && iterationsCount < iterations) {
-        temp = zReal * zImag;
-        zReal = zReal * zReal - zImag * zImag + real;
-        zImag = 2 * temp + imag;
-        iterationsCount++;
-      }
-
-      // Определение цвета
-      let hue = 0;
-      if (iterationsCount === iterations) {
-        hue = 0;
-      } else {
-        hue = (iterationsCount / iterations) * 360;
-      }
-
-      let color = '';
-      switch (colorScheme) {
-        case 'classic':
-          color = `hsl(${hue}, 100%, 50%)`;
-          break;
-        case 'rainbow':
-          color = `hsl(${hue}, 100%, 70%)`;
-          break;
-        case 'monochrome':
-          color = `hsl(0, 0%, ${(iterationsCount / iterations) * 100}%)`;
-          break;
-      }
-
-      ctx.fillStyle = color;
-      ctx.fillRect(x, y, 1, 1);
-    }
-  }
-}
-
-// ===== Анимация переходов =====
-function animateTransition() {
-  if (fractalParams.isAnimating) return;
-  fractalParams.isAnimating = true;
-
-  const startTime = performance.now();
-  const duration = 500;
-
-  function render(currentTime) {
-    const elapsed = currentTime - startTime;
-    const progress = Math.min(elapsed / duration, 1);
-
-    // Очистка канвы с анимацией
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    // Заполняем канву временным цветом
-    ctx.fillStyle = `rgba(0, 0, 0, ${progress})`;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    if (progress < 1) {
-      fractalParams.animationFrameId = requestAnimationFrame(render);
+// Обновление фрактала с анимацией
+function updateFractal() {
+    const palette = palettes[currentPalette];
+    
+    // Анимация обновления
+    const loadingAnimation = () => {
+        const imageData = ctx.createImageData(canvas.width, canvas.height);
+        const data = imageData.data;
+        const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+        gradient.addColorStop(0, 'rgba(0, 0, 0, 0.7)');
+        gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        // Анимация загрузки
+        const progressImageData = ctx.createImageData(canvas.width, canvas.height);
+        const progressData = progressImageData.data;
+        for (let y = 0; y < canvas.height; y++) {
+            for (let x = 0; x < canvas.width; x++) {
+                const index = (y * canvas.width + x) * 4;
+                progressData[index] = 255 * 0.5;
+                progressData[index + 1] = 255 * 0.5;
+                progressData[index + 2] = 255 * 0.5;
+                progressData[index + 3] = 255;
+            }
+        }
+        ctx.putImageData(progressImageData, 0, 0);
+    };
+    
+    // Обновление фрактала
+    if (currentFractal === 'mandelbrot') {
+        renderMandelbrotWithAnimation(canvas, palette, iterations, zoom);
     } else {
-      fractalParams.isAnimating = false;
-      cancelAnimationFrame(fractalParams.animationFrameId);
-      drawFractal();
+        renderJuliaWithAnimation(canvas, palette, iterations, zoom);
     }
-  }
-
-  fractalParams.animationFrameId = requestAnimationFrame(render);
+    
+    // Микроинтерактивность: пульсация кнопки
+    const updateBtn = document.getElementById('updateBtn');
+    updateBtn.style.transform = 'scale(1.05)';
+    setTimeout(() => {
+        updateBtn.style.transform = 'scale(1)';
+    }, 200);
 }
 
-// ===== Переключение тем =====
-function toggleTheme() {
-  const body = document.body;
-  const isDark = body.classList.toggle('dark-theme');
-  localStorage.setItem('theme', isDark ? 'dark' : 'light');
-  themeToggleBtn.textContent = isDark ? 'Светлая тема' : 'Тёмная тема';
-  animateTransition();
+// Выбор палитры
+function selectPalette(name) {
+    currentPalette = name;
+    const options = document.querySelectorAll('.palette-option');
+    options.forEach(option => {
+        option.classList.remove('active');
+    });
+    document.querySelector(`.palette-option[data-palette="${name}"]`).classList.add('active');
+    updateFractal();
 }
 
-// ===== Экспорт как PNG =====
-function exportAsPNG() {
-  const link = document.createElement('a');
-  link.download = 'fractal.png';
-  link.href = canvas.toDataURL('image/png');
-  link.click();
-}
+// Обновление значений
+document.getElementById('iterations').addEventListener('input', (e) => {
+    iterations = parseInt(e.target.value);
+    document.getElementById('iterationsValue').textContent = iterations;
+    updateFractal();
+});
 
-// ===== Подписка на события =====
-iterationsSlider.addEventListener('input', animateTransition);
-colorSchemeSelect.addEventListener('change', animateTransition);
-exportBtn.addEventListener('click', exportAsPNG);
-themeToggleBtn.addEventListener('click', toggleTheme);
+document.getElementById('fractalType').addEventListener('change', (e) => {
+    currentFractal = e.target.value;
+    updateFractal();
+});
 
-// ===== Резиновое масштабирование =====
+document.getElementById('updateBtn').addEventListener('click', () => {
+    updateFractal();
+});
+
+// Экспорт фрактала
+document.getElementById('exportBtn').addEventListener('click', () => {
+    const link = document.createElement('a');
+    link.download = 'fractal.png';
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+    
+    // Анимация экспорта
+    const exportAnimation = () => {
+        const imageData = ctx.createImageData(canvas.width, canvas.height);
+        const data = imageData.data;
+        for (let y = 0; y < canvas.height; y++) {
+            for (let x = 0; x < canvas.width; x++) {
+                const index = (y * canvas.width + x) * 4;
+                data[index] = 255;
+                data[index + 1] = 255;
+                data[index + 2] = 255;
+                data[index + 3] = 255;
+            }
+        }
+        ctx.putImageData(imageData, 0, 0);
+        setTimeout(() => {
+            updateFractal();
+        }, 500);
+    };
+    exportAnimation();
+});
+
+// Адаптивность
 window.addEventListener('resize', () => {
-  fractalParams.width = window.innerWidth * 0.8;
-  fractalParams.height = window.innerHeight * 0.6;
-  canvas.width = fractalParams.width;
-  canvas.height = fractalParams.height;
-  drawFractal();
+    canvas.width = window.innerWidth * 0.8;
+    canvas.height = window.innerHeight * 0.6;
+    updateFractal();
 });
 
-// ===== Инициализация =====
-window.addEventListener('load', () => {
-  initCanvas();
-  loadingElement.style.opacity = '0';
-  loadingElement.classList.add('fade-out');
-  setTimeout(() => {
-    fractalContainer.style.display = 'block';
-  }, 500);
-
-  // Проверка сохранённой темы
-  const savedTheme = localStorage.getItem('theme');
-  if (savedTheme === 'dark') {
-    document.body.classList.add('dark-theme');
-    themeToggleBtn.textContent = 'Светлая тема';
-  }
-
-  // Поддержка prefers-color-scheme
-  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-  if (prefersDark && savedTheme !== 'light') {
-    document.body.classList.add('dark-theme');
-    themeToggleBtn.textContent = 'Светлая тема';
-  }
-});
+// Начальное рендеринг
+updateFractal();

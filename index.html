@@ -4,49 +4,53 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Fractal Visualizer</title>
-  <link rel="stylesheet" href="styles.css">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles/main.css">
 </head>
 <body>
-  <!-- Theme Toggle (fixed) -->
-  <div class="theme-toggle">
-    <button id="themeToggle" aria-label="Toggle dark mode">Dark Mode</button>
-  </div>
-
-  <!-- Loading Screen -->
-  <div class="loading-container" id="loadingScreen" role="alert" aria-live="polite">
-    <div class="loader"></div>
-    <div class="loading-text">Loading fractal...</div>
-    <div class="progress-container" id="progressContainer" style="display: none;">
-      <div class="progress-bar" id="progressBar"></div>
+  <div class="container">
+    <div class="fractal-container">
+      <canvas id="fractalCanvas"></canvas>
+      <div class="loading-spinner" id="loadingSpinner"></div>
+    </div>
+    
+    <div class="controls-panel">
+      <div class="control-group">
+        <label for="fractalType">Choose Fractal:</label>
+        <select id="fractalType">
+          <option value="mandelbrot">Mandelbrot</option>
+          <option value="julia">Julia</option>
+        </select>
+      </div>
+      
+      <div class="control-group">
+        <label for="iterations">Iterations:</label>
+        <input type="number" id="iterations" min="1" max="500" value="100">
+      </div>
+      
+      <div class="control-group">
+        <label for="zoom">Zoom:</label>
+        <input type="number" id="zoom" min="0.1" max="10" step="0.1" value="1.0">
+      </div>
+      
+      <button id="updateBtn" title="Update fractal settings">Update Fractal</button>
+      <button id="exportBtn" title="Export fractal as PNG or SVG">Export Fractal <span class="export-icon">🖼️</span></button>
     </div>
   </div>
-
-  <!-- Fractal Container -->
-  <div class="fractal-container">
-    <canvas id="fractalCanvas" aria-label="Fractal visualization" role="application" tabindex="0" aria-live="polite"></canvas>
-  </div>
-
-  <!-- Controls Panel (fixed for all devices) -->
-  <div class="controls" id="controlsPanel" role="region" aria-label="Fractal controls">
-    <div class="slider-container">
-      <label class="slider-label" for="iterationsSlider">Iterations</label>
-      <input type="range" id="iterationsSlider" class="slider" min="1" max="100" value="50" aria-label="Adjust iterations for fractal detail" aria-valuemin="1" aria-valuemax="100" aria-valuenow="50">
-      <span class="slider-value" id="iterationsValue">50</span>
+  
+  <!-- Модальное окно для экспорта -->
+  <div id="exportModal" class="modal">
+    <div class="modal-content">
+      <span class="close-btn" id="closeModal">&times;</span>
+      <h2>Export Fractal</h2>
+      <p>Choose export format:</p>
+      <div class="export-options">
+        <button id="exportPngBtn" class="export-option-btn" title="Export as PNG">Export as PNG</button>
+        <button id="exportSvgBtn" class="export-option-btn" title="Export as SVG">Export as SVG</button>
+      </div>
     </div>
-    <div class="slider-container">
-      <label class="slider-label" for="zoomSlider">Zoom</label>
-      <input type="range" id="zoomSlider" class="slider" min="0.1" max="2" step="0.1" value="1" aria-label="Adjust zoom level" aria-valuemin="0.1" aria-valuemax="2" aria-valuenow="1">
-      <span class="slider-value" id="zoomValue">1.0</span>
-    </div>
-    <button class="button" id="resetButton" aria-label="Reset fractal view" aria-controls="fractalCanvas">Reset View</button>
   </div>
-
-  <!-- Footer -->
-  <footer class="footer" role="contentinfo" aria-label="Fractal Visualizer footer">
-    Fractal Visualizer | Press F12 for DevTools
-  </footer>
-
-  <script src="script.js"></script>
+  
+  <script src="https://cdn.jsdelivr.net/npm/svg.js@3.0/dist/svg.min.js"></script>
+  <script src="src/main.js"></script>
 </body>
 </html>

@@ -10,11 +10,11 @@
 <body>
   <!-- Theme Toggle (fixed) -->
   <div class="theme-toggle">
-    <button id="themeToggle">Dark Mode</button>
+    <button id="themeToggle" aria-label="Toggle dark mode">Dark Mode</button>
   </div>
 
   <!-- Loading Screen -->
-  <div class="loading-container" id="loadingScreen">
+  <div class="loading-container" id="loadingScreen" role="alert" aria-live="polite">
     <div class="loader"></div>
     <div class="loading-text">Loading fractal...</div>
     <div class="progress-container" id="progressContainer" style="display: none;">
@@ -24,26 +24,26 @@
 
   <!-- Fractal Container -->
   <div class="fractal-container">
-    <canvas id="fractalCanvas"></canvas>
+    <canvas id="fractalCanvas" aria-label="Fractal visualization" role="application" tabindex="0"></canvas>
   </div>
 
   <!-- Controls Panel (fixed for all devices) -->
-  <div class="controls" id="controlsPanel">
+  <div class="controls" id="controlsPanel" role="region" aria-label="Fractal controls">
     <div class="slider-container">
       <label class="slider-label" for="iterationsSlider">Iterations</label>
-      <input type="range" id="iterationsSlider" class="slider" min="1" max="100" value="50">
+      <input type="range" id="iterationsSlider" class="slider" min="1" max="100" value="50" aria-label="Adjust iterations for fractal detail" aria-valuemin="1" aria-valuemax="100" aria-valuenow="50">
       <span class="slider-value" id="iterationsValue">50</span>
     </div>
     <div class="slider-container">
       <label class="slider-label" for="zoomSlider">Zoom</label>
-      <input type="range" id="zoomSlider" class="slider" min="0.1" max="2" step="0.1" value="1">
+      <input type="range" id="zoomSlider" class="slider" min="0.1" max="2" step="0.1" value="1" aria-label="Adjust zoom level" aria-valuemin="0.1" aria-valuemax="2" aria-valuenow="1">
       <span class="slider-value" id="zoomValue">1.0</span>
     </div>
-    <button class="button" id="resetButton">Reset View</button>
+    <button class="button" id="resetButton" aria-label="Reset fractal view">Reset View</button>
   </div>
 
   <!-- Footer -->
-  <footer class="footer">
+  <footer class="footer" role="contentinfo" aria-label="Fractal Visualizer footer">
     Fractal Visualizer | Press F12 for DevTools
   </footer>
 

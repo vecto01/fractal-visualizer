@@ -2,11 +2,11 @@
   --primary-bg: #121212;
   --primary-text: #e0e0e0;
   --secondary-bg: #1e1e1e;
-  --secondary-text: #b0b0b0;
+  --secondary-text: #d0d0d0; /* Увеличена яркость для лучшей контрастности */
   --accent-color: #4a6fa5;
   --accent-hover: #5a7fa5;
   --accent-active: #3a5a8f;
-  --button-hover: #5a7fa5;
+  --button-hover: #6a8fa5; /* Увеличена яркость для кнопок */
   --button-active: #3a5a8f;
   --border-color: #333;
   --transition-speed: 0.2s;
@@ -183,7 +183,7 @@ canvas {
 
 .slider::-webkit-slider-thumb:active {
   transform: scale(0.9);
-  background: var(--accent-active);
+  background: var(--button-active);
   box-shadow: var(--shadow-sm);
 }
 
@@ -345,11 +345,11 @@ canvas {
   --primary-bg: #121212;
   --primary-text: #e0e0e0;
   --secondary-bg: #1e1e1e;
-  --secondary-text: #b0b0b0;
+  --secondary-text: #d0d0d0;
   --accent-color: #4a6fa5;
   --accent-hover: #5a7fa5;
   --accent-active: #3a5a8f;
-  --button-hover: #5a7fa5;
+  --button-hover: #6a8fa5;
   --button-active: #3a5a8f;
 }
 
@@ -359,8 +359,8 @@ canvas {
   --secondary-bg: #ffffff;
   --secondary-text: #666;
   --accent-color: #4a6fa5;
-  --accent-hover: #3a5a8f;
-  --accent-active: #2a4a7f;
+  --accent-hover: #e0e0e0;
+  --accent-active: #d0d0d0;
   --button-hover: #e0e0e0;
   --button-active: #d0d0d0;
 }

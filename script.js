@@ -1,151 +1,238 @@
-document.addEventListener('DOMContentLoaded', () => {
-  // DOM Elements
-  const canvas = document.getElementById('fractalCanvas');
-  const loadingScreen = document.getElementById('loadingScreen');
-  const progressBar = document.getElementById('progressBar');
-  const loadingText = document.querySelector('.loading-text');
-  const fractalContainer = document.querySelector('.fractal-container');
-  const loadingComplete = document.createElement('div');
-  loadingComplete.className = 'loading-complete';
-  loadingComplete.textContent = 'Fractal loaded!';
-  loadingScreen.appendChild(loadingComplete);
+// ===== Fractal Visualizer =====
 
-  const iterationsSlider = document.getElementById('iterationsSlider');
-  const iterationsValue = document.getElementById('iterationsValue');
-  const zoomSlider = document.getElementById('zoomSlider');
-  const zoomValue = document.getElementById('zoomValue');
-  const resetButton = document.getElementById('resetButton');
-  const themeToggle = document.getElementById('themeToggle');
+// DOM Elements
+const canvas = document.getElementById('fractalCanvas');
+const ctx = canvas.getContext('2d');
+const themeToggle = document.getElementById('themeToggle');
+const iterationsSlider = document.getElementById('iterationsSlider');
+const zoomSlider = document.getElementById('zoomSlider');
+const resetButton = document.getElementById('resetButton');
+const iterationsValue = document.getElementById('iterationsValue');
+const zoomValue = document.getElementById('zoomValue');
+const loadingScreen = document.getElementById('loadingScreen');
+const fractalContainer = document.querySelector('.fractal-container');
+const controlsPanel = document.getElementById('controlsPanel');
 
-  // Context and settings
-  const ctx = canvas.getContext('2d');
-  let zoomLevel = 1;
-  let iterations = 50;
-  let isLoading = true;
+// Fractal Settings
+let iterations = 50;
+let zoom = 1;
+let offsetX = 0;
+let offsetY = 0;
+let isDragging = false;
+let lastMouseX, lastMouseY;
 
-  // Simulate loading progress with timeout
-  function simulateLoadingWithTimeout() {
-    isLoading = true;
-    loadingScreen.style.display = 'flex';
-    progressBar.style.width = '0%';
-    loadingText.textContent = 'Loading fractal...'
-    loadingComplete.style.display = 'none';
+// Cache for fractal rendering
+const fractalCache = new Map();
 
-    // Simulate loading steps
-    const steps = 5;
-    const interval = setInterval(() => {
-      const progress = Math.min(100, progressBar.style.width.replace('%', '') + (100 / steps));
-      progressBar.style.width = `${progress}%`;
+// Vibration function for mobile devices
+function vibrate() {
+  if ('vibrate' in navigator) {
+    navigator.vibrate(50); // Vibrate for 50 milliseconds
+  }
+}
 
-      if (progress >= 100) {
-        clearInterval(interval);
-        setTimeout(() => {
-          isLoading = false;
-          loadingScreen.style.display = 'none';
-          loadingComplete.style.display = 'block';
-          fractalContainer.style.opacity = '1';
-          setTimeout(() => {
-            loadingComplete.style.opacity = '0';
-            setTimeout(() => {
-              loadingComplete.style.display = 'none';
-            }, 500);
-          }, 1000);
-        }, 500);
+// DOM Event Listeners
+iterationsSlider.addEventListener('input', () => {
+  iterations = parseInt(iterationsSlider.value);
+  iterationsValue.textContent = iterations;
+  renderFractal();
+  vibrate();
+});
+
+zoomSlider.addEventListener('input', () => {
+  zoom = parseFloat(zoomSlider.value);
+  zoomValue.textContent = zoom.toFixed(1);
+  renderFractal();
+  vibrate();
+});
+
+resetButton.addEventListener('click', () => {
+  offsetX = 0;
+  offsetY = 0;
+  renderFractal();
+  vibrate();
+});
+
+// Mouse and touch events for dragging
+canvas.addEventListener('mousedown', (e) => {
+  isDragging = true;
+  lastMouseX = e.clientX;
+  lastMouseY = e.clientY;
+  vibrate();
+});
+
+canvas.addEventListener('mousemove', (e) => {
+  if (!isDragging) return;
+  const dx = (e.clientX - lastMouseX) * 0.005;
+  const dy = (e.clientY - lastMouseY) * 0.005;
+  offsetX += dx;
+  offsetY += dy;
+  lastMouseX = e.clientX;
+  lastMouseY = e.clientY;
+  renderFractal();
+});
+
+canvas.addEventListener('mouseup', () => {
+  isDragging = false;
+});
+
+canvas.addEventListener('wheel', (e) => {
+  e.preventDefault();
+  const delta = e.deltaY * 0.001;
+  zoom = Math.max(0.1, Math.min(2, zoom - delta));
+  zoomSlider.value = zoom;
+  zoomValue.textContent = zoom.toFixed(1);
+  renderFractal();
+  vibrate();
+});
+
+// Keyboard navigation
+canvas.addEventListener('keydown', (e) => {
+  const step = 0.01;
+
+  switch (e.key) {
+    case 'ArrowUp':
+      offsetY -= step;
+      vibrate();
+      break;
+    case 'ArrowDown':
+      offsetY += step;
+      vibrate();
+      break;
+    case 'ArrowLeft':
+      offsetX -= step;
+      vibrate();
+      break;
+    case 'ArrowRight':
+      offsetX += step;
+      vibrate();
+      break;
+    case '+':
+    case '=':
+      zoom = Math.min(2, zoom + 0.1);
+      vibrate();
+      break;
+    case '-':
+      zoom = Math.max(0.1, zoom - 0.1);
+      vibrate();
+      break;
+    case 'r':
+      offsetX = 0;
+      offsetY = 0;
+      vibrate();
+      break;
+  }
+
+  // Update sliders
+  zoomSlider.value = zoom;
+  zoomValue.textContent = zoom.toFixed(1);
+  renderFractal();
+});
+
+// Theme toggle
+themeToggle.addEventListener('click', () => {
+  document.body.classList.toggle('dark-theme');
+  document.body.classList.toggle('light-theme');
+  localStorage.setItem('theme', document.body.classList.contains('dark-theme') ? 'dark' : 'light');
+  vibrate();
+});
+
+// Lazy loading with IntersectionObserver
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      renderFractal();
+      observer.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.5 });
+
+// Initialize fractal
+function initFractal() {
+  const size = Math.min(window.innerWidth * 0.9, window.innerHeight * 0.9);
+  canvas.width = size;
+  canvas.height = size;
+  observer.observe(canvas); // Observe canvas for lazy loading
+  renderFractal();
+}
+
+// Render fractal with caching
+function renderFractal() {
+  const width = canvas.width;
+  const height = canvas.height;
+  ctx.clearRect(0, 0, width, height);
+  ctx.fillStyle = 'black';
+  ctx.fillRect(0, 0, width, height);
+
+  // Mandelbrot set rendering logic
+  const centerX = -0.5;
+  const centerY = 0;
+  const pixelSize = 3.5 / zoom;
+
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      const real = (x - width / 2) * pixelSize + centerX + offsetX;
+      const imag = (y - height / 2) * pixelSize + centerY + offsetY;
+      const key = `${real},${imag},${iterations}`;
+      
+      if (fractalCache.has(key)) {
+        const color = fractalCache.get(key);
+        ctx.fillStyle = `hsl(${color}, 100%, 50%)`;
+      } else {
+        const color = mandelbrot(real, imag, iterations);
+        fractalCache.set(key, color);
+        ctx.fillStyle = `hsl(${color}, 100%, 50%)`;
       }
-    }, 500);
-  }
-
-  // Draw fractal (simplified for demo)
-  function drawFractal() {
-    if (isLoading) return;
-
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = '#1e1e1e';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    // Simulate fractal rendering
-    for (let i = 0; i < canvas.width; i += 2) {
-      for (let j = 0; j < canvas.height; j += 2) {
-        const x = (i - canvas.width / 2) / (zoomLevel * 100);
-        const y = (j - canvas.height / 2) / (zoomLevel * 100);
-        const zx = x;
-        const zy = y;
-        let xx = 0;
-        let yy = 0;
-        let iter = 0;
-
-        while (xx * xx + yy * yy < 4 && iter < iterations) {
-          const tmp = xx * xx - yy * yy + x;
-          yy = 2 * xx * yy + y;
-          xx = tmp;
-          iter++;
-        }
-
-        ctx.fillStyle = iter === iterations ? '#1e1e1e' : `hsl(${iter * 2}, 100%, 50%)`;
-        ctx.fillRect(i, j, 2, 2);
-      }
+      ctx.fillRect(x, y, 1, 1);
     }
   }
+}
 
-  // Initialize canvas
-  function initCanvas() {
-    const size = Math.min(window.innerWidth * 0.9, window.innerHeight * 0.7);
-    canvas.width = size;
-    canvas.height = size;
-    fractalContainer.style.maxWidth = `${size}px`;
-    fractalContainer.style.height = `${size}px`;
-    drawFractal();
+// Mandelbrot set algorithm
+function mandelbrot(cx, cy, maxIter) {
+  let x = 0;
+  let y = 0;
+  let iter = 0;
+
+  while (x * x + y * y < 4 && iter < maxIter) {
+    const temp = x * x - y * y + cx;
+    y = 2 * x * y + cy;
+    x = temp;
+    iter++;
   }
 
-  // Event listeners
-  iterationsSlider.addEventListener('input', () => {
-    iterations = parseInt(iterationsSlider.value);
-    iterationsValue.textContent = iterations;
-    drawFractal();
-  });
+  if (iter === maxIter) return 0;
+  return iter;
+}
 
-  zoomSlider.addEventListener('input', () => {
-    zoomLevel = parseFloat(zoomSlider.value);
-    zoomValue.textContent = zoomLevel.toFixed(1);
-    drawFractal();
-  });
+// Loading screen
+function hideLoadingScreen() {
+  loadingScreen.style.display = 'none';
+  fractalContainer.style.opacity = 1;
+  controlsPanel.style.opacity = 1;
+  setTimeout(() => {
+    const loadingComplete = document.createElement('div');
+    loadingComplete.className = 'loading-complete';
+    loadingComplete.textContent = 'Ready!';
+    loadingScreen.appendChild(loadingComplete);
+  }, 500);
+}
 
-  resetButton.addEventListener('click', () => {
-    zoomLevel = 1;
-    zoomSlider.value = 1;
-    zoomValue.textContent = '1.0';
-    drawFractal();
-  });
+// Load saved theme
+const savedTheme = localStorage.getItem('theme');
+if (savedTheme === 'dark') {
+  document.body.classList.add('dark-theme');
+} else if (savedTheme === 'light') {
+  document.body.classList.add('light-theme');
+}
 
-  // Theme toggle
-  themeToggle.addEventListener('click', () => {
-    document.body.classList.toggle('light-theme');
-    themeToggle.textContent = document.body.classList.contains('light-theme') ? 'Dark Mode' : 'Light Mode';
-  });
+// Initialize
+window.addEventListener('load', () => {
+  initFractal();
+  setTimeout(hideLoadingScreen, 1000);
+});
 
-  // Handle window resize
-  window.addEventListener('resize', () => {
-    if (!isLoading) {
-      initCanvas();
-    }
-  });
-
-  // Keyboard navigation
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'ArrowUp' || e.key === 'ArrowDown' || e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
-      e.preventDefault();
-      const step = 0.1 * zoomLevel;
-      if (e.key === 'ArrowUp') canvas.style.transform = `translateY(${canvas.style.transform === 'translateY(-100px)' ? '0' : '-100px'})`;
-      if (e.key === 'ArrowDown') canvas.style.transform = `translateY(${canvas.style.transform === 'translateY(0)' ? '100px' : '0'})`;
-      if (e.key === 'ArrowLeft') canvas.style.transform = `translateX(${canvas.style.transform === 'translateX(0)' ? '-100px' : '0'})`;
-      if (e.key === 'ArrowRight') canvas.style.transform = `translateX(${canvas.style.transform === 'translateX(0)' ? '100px' : '0'})`;
-    }
-  });
-
-  // Start loading simulation
-  simulateLoadingWithTimeout();
-  initCanvas();
-
-  // Debug logs
-  console.log('Fractal visualizer initialized. Loading simulation started.');
+// Resize handler
+window.addEventListener('resize', () => {
+  initFractal();
 });

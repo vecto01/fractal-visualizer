@@ -1,42 +1,315 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Интерактивная визуализация фракталов</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Fractal Visualizer</title>
+    <style>
+        :root {
+            --bg-dark: #121212;
+            --bg-light: #f8f8f8;
+            --text-primary: #ffffff;
+            --text-secondary: #cccccc;
+            --accent: #4a6fa5;
+            --border-color: #333333;
+            --button-bg: #333333;
+            --button-hover: #444444;
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-primary);
+            transition: background-color 0.5s ease;
+        }
+        
+        .dark-theme {
+            background-color: var(--bg-dark);
+        }
+        
+        .light-theme {
+            background-color: var(--bg-light);
+            color: #333333;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(18, 18, 18, 0.9);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+        
+        .loading-screen.active {
+            opacity: 1;
+        }
+        
+        .loader {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            border-top-color: var(--accent);
+            animation: spin 1s ease-in-out infinite;
+            margin-bottom: 20px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .fractal-container {
+            width: 100%;
+            max-width: 800px;
+            height: 60vh;
+            min-height: 400px;
+            background-color: var(--bg-dark);
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .controls {
+            width: 100%;
+            max-width: 400px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        button {
+            padding: 10px 16px;
+            background-color: var(--button-bg);
+            color: var(--text-primary);
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            align-self: flex-start;
+        }
+        
+        button:hover {
+            background-color: var(--button-hover);
+            transform: translateY(-1px);
+        }
+        
+        .slider-container {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        input[type="range"] {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: var(--border-color);
+            outline: none;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--accent);
+            cursor: pointer;
+        }
+        
+        .status-message {
+            text-align: center;
+            padding: 10px;
+            font-size: 14px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .status-message.active {
+            opacity: 1;
+        }
+        
+        footer {
+            margin-top: 40px;
+            padding: 16px;
+            text-align: center;
+            border-top: 1px solid var(--border-color);
+            width: 100%;
+        }
+        
+        @media (max-width: 768px) {
+            .controls {
+                max-width: 350px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .fractal-container {
+                height: 50vh;
+            }
+            .controls {
+                max-width: 100%;
+            }
+        }
+    </style>
 </head>
 <body>
-    <header>
-        <h1>Фрактал: Множество Мандельброта</h1>
-        <div class="theme-toggle">
-            <button id="theme-toggle">Тёмная тема</button>
+    <div class="container">
+        <div class="loading-screen" id="loadingScreen">
+            <div class="loader"></div>
+            <p>Generating fractal...</p>
         </div>
-    </header>
-    <main>
-        <div class="canvas-container">
-            <canvas id="fractal-canvas"></canvas>
+        
+        <div class="status-message" id="statusMessage">
+            Generating fractal...
         </div>
+        
+        <canvas id="fractalCanvas" class="fractal-container"></canvas>
+        
         <div class="controls">
-            <div class="control-group">
-                <label for="iterations">Итерации:</label>
-                <input type="range" id="iterations" min="10" max="200" value="100">
-                <span id="iterations-value">100</span>
+            <button id="resetView">Reset View</button>
+            <div class="slider-container">
+                <label for="iterationsSlider">Iterations</label>
+                <input type="range" id="iterationsSlider" min="1" max="100" value="50">
+                <span id="iterationsValue">50</span>
             </div>
-            <div class="control-group">
-                <label for="zoom">Масштаб:</label>
-                <input type="range" id="zoom" min="0.1" max="2" step="0.1" value="1">
+            <div class="slider-container">
+                <label for="zoomSlider">Zoom</label>
+                <input type="range" id="zoomSlider" min="0.1" max="2" step="0.1" value="1">
             </div>
-            <div class="control-group">
-                <label for="color-scheme">Цветовая схема:</label>
-                <select id="color-scheme">
-                    <option value="rainbow">Радужная</option>
-                    <option value="black-white">Чёрно-белая</option>
-                </select>
-            </div>
-            <button id="export-btn">Экспортировать</button>
+            <button id="changeColors">Change Colors</button>
         </div>
-    </main>
-    <script src="script.js"></script>
+    
+        <footer>
+            <p>© 2023 Fractal Visualizer</p>
+        </footer>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const canvas = document.getElementById('fractalCanvas');
+            const ctx = canvas.getContext('2d');
+            const loadingScreen = document.getElementById('loadingScreen');
+            const statusMessage = document.getElementById('statusMessage');
+            
+            // Check for saved theme
+            const savedTheme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const theme = savedTheme || (prefersDark ? 'dark' : 'light');
+            document.body.className = theme;
+            
+            // Show loading screen
+            loadingScreen.classList.add('active');
+            statusMessage.classList.add('active');
+            
+            // Simulate loading delay
+            setTimeout(() => {
+                loadingScreen.classList.remove('active');
+                statusMessage.classList.remove('active');
+                renderFractal();
+            }, 1000);
+            
+            // Fractal rendering logic
+            function renderFractal() {
+                const width = canvas.width = window.innerWidth * 0.8;
+                const height = canvas.height = window.innerHeight * 0.3;
+                const centerX = width / 2;
+                const centerY = height / 2;
+                const zoom = 1;
+                const iterations = 50;
+                
+                ctx.fillStyle = 'black';
+                ctx.fillRect(0, 0, width, height);
+                
+                // Example: Mandelbrot set rendering
+                const imageData = ctx.createImageData(width, height);
+                const data = imageData.data;
+                
+                for (let x = 0; x < width; x++) {
+                    for (let y = 0; y < height; y++) {
+                        const real = (x - centerX) / zoom;
+                        const imag = (y - centerY) / zoom;
+                        let zx = 0, zy = 0;
+                        let iter = 0;
+                        
+                        while (zx * zx + zy * zy < 4 && iter < iterations) {
+                            const newX = zx * zx - zy * zy + real;
+                            const newY = 2 * zx * zy + imag;
+                            zx = newX;
+                            zy = newY;
+                            iter++;
+                        }
+                        
+                        // Color based on iteration count
+                        const index = (x + y * width) * 4;
+                        if (iter < iterations) {
+                            data[index] = iter * 2; // R
+                            data[index + 1] = iter * 3; // G
+                            data[index + 2] = iter * 4; // B
+                            data[index + 3] = 255; // A
+                        } else {
+                            data[index] = 0; // R
+                            data[index + 1] = 0; // G
+                            data[index + 2] = 0; // B
+                            data[index + 3] = 255; // A
+                        }
+                    }
+                }
+                
+                ctx.putImageData(imageData, 0, 0);
+            }
+            
+            // Event listeners
+            document.getElementById('resetView').addEventListener('click', function() {
+                renderFractal();
+            });
+            
+            document.getElementById('iterationsSlider').addEventListener('input', function() {
+                const iterationsValue = document.getElementById('iterationsValue');
+                iterationsValue.textContent = this.value;
+                renderFractal();
+            });
+            
+            document.getElementById('zoomSlider').addEventListener('input', function() {
+                renderFractal();
+            });
+            
+            document.getElementById('changeColors').addEventListener('click', function() {
+                const theme = document.body.className;
+                const newTheme = theme === 'dark' ? 'light' : 'dark';
+                document.body.className = newTheme;
+                localStorage.setItem('theme', newTheme);
+                renderFractal();
+            });
+            
+            // Handle window resize
+            window.addEventListener('resize', function() {
+                renderFractal();
+            });
+        });
+    </script>
 </body>
 </html>

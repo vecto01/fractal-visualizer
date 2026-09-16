@@ -1,0 +1,56 @@
+/* Тёмная тема по умолчанию */
+.dark-theme {
+    background-color: #121212;
+    color: #E0E0E0;
+}
+
+/* Светлая тема */
+.light-theme {
+    background-color: #FFFFFF;
+    color: #333333;
+}
+
+/* Высокий контраст для элементов управления */
+.dark-theme .control-label {
+    color: #FFFFFF;
+    font-weight: 500;
+}
+
+.dark-theme input, .dark-theme select {
+    background-color: #2D2D2D;
+    color: #FFFFFF;
+    border: 1px solid #4A4A4A;
+}
+
+.dark-theme button {
+    background-color: #4A90E2;
+    color: #FFFFFF;
+    border: none;
+    transition: background-color 0.3s ease;
+}
+
+.dark-theme button:hover {
+    background-color: #357ABD;
+}
+
+/* Анимация загрузки */
+@keyframes load-fractal {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Анимация для блоков настроек */
+@keyframes fade-in {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Экспорт кнопки */
+.export-btn {
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.dark-theme .export-btn {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+}

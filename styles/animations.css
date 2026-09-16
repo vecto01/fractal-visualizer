@@ -1,0 +1,49 @@
+@charset "UTF-8";
+
+/* Анимация появления фрактала */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.fractal-canvas.visible {
+    animation: fadeIn 0.5s ease-out;
+}
+
+/* Анимация ползунка */
+input[type="range"]::-webkit-slider-thumb {
+    transition: background 0.2s ease;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+    background: #7a7a7a;
+}
+
+input[type="range"]::-webkit-slider-thumb:active {
+    transform: scale(1.1);
+}
+
+/* Анимация кнопок */
+button {
+    transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+button:active {
+    transform: scale(0.98);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Анимация загрузки */
+.spinner {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Анимация переключения тем */
+body {
+    transition: background-color 0.3s ease, color 0.3s ease;
+}

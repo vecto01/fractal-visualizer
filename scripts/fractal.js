@@ -87,12 +87,12 @@ function updateFractal() {
         for (let y = 0; y < canvas.height; y++) {
             for (let x = 0; x < canvas.width; x++) {
                 const progress = (y * canvas.width + x) / (canvas.width * canvas.height);
-                const index = (y * canvas.width + x) * 4;
-                progressData[index] = 255 * progress;
-                progressData[index + 1] = 255 * progress;
-                progressData[index + 2] = 255 * progress;
-                progressData[index + 3] = 255;
-            }
+    // Анимация появления канваса
+    const canvas = document.getElementById('fractalCanvas');
+    canvas.style.opacity = '0';
+    setTimeout(() => {
+        canvas.style.opacity = '1';
+    }, 100);
         }
         ctx.putImageData(progressImageData, 0, 0);
     };

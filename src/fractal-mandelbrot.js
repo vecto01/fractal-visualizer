@@ -1,6 +1,5 @@
 // Фрактал Мандельброта
 const MandelbrotFractal = {
-  
   // Параметры фрактала
   params: {
     iterations: 100,
@@ -8,6 +7,9 @@ const MandelbrotFractal = {
     xOffset: -0.5,
     yOffset: 0.0,
   },
+  
+  // Палитра по умолчанию
+  palette: [],
   
   // Инициализация
   init: function(canvas, width, height) {
@@ -19,7 +21,12 @@ const MandelbrotFractal = {
     this.render();
   },
   
-  // Рендеринг фрактала
+  // Установка палитры
+  setPalette: function(palette) {
+    this.palette = palette;
+  },
+  
+  // Рендеринг фрактала с использованием палитры
   render: function() {
     const { width, height, params } = this;
     const { iterations, zoom, xOffset, yOffset } = params;
@@ -48,11 +55,14 @@ const MandelbrotFractal = {
           iter = i;
         }
         
-        // Цветовая схема (простая палитра)
-        const colorIndex = iter % 256;
-        pixelData[(x + y * width) * 4] = colorIndex; // R
-        pixelData[(x + y * width) * 4 + 1] = colorIndex; // G
-        pixelData[(x + y * width) * 4 + 2] = colorIndex; // B
+        // Определение индекса цвета из палитры
+        const colorIndex = iter % this.palette.length;
+        const color = this.palette[colorIndex];
+        
+        // Заполнение пикселя цветом
+        pixelData[(x + y * width) * 4] = parseInt(color.substr(1), 16) & 0xFF; // R
+        pixelData[(x + y * width) * 4 + 1] = parseInt(color.substr(3), 16) & 0xFF; // G
+        pixelData[(x + y * width) * 4 + 2] = parseInt(color.substr(5), 16) & 0xFF; // B
         pixelData[(x + y * width) * 4 + 3] = 255; // A
       }
     }

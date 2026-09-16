@@ -9,13 +9,15 @@
   --control-active: #dee2e6;
   --modal-bg: rgba(0, 0, 0, 0.7);
   --modal-content-bg: #ffffff;
-  --export-btn-bg: #333333;
+  --export-btn-bg: #3498db;
   --export-icon: "🖼️";
   --animation-duration: 0.3s;
   --transition-duration: 0.2s;
   --spinner-color: var(--primary-color);
   --toast-bg: var(--primary-color);
   --toast-text: white;
+  --palette-border: #ccc;
+  --accent-color: #2ecc71;
 }
 
 :root.dark-mode {
@@ -29,13 +31,15 @@
   --control-active: #555;
   --modal-bg: rgba(0, 0, 0, 0.8);
   --modal-content-bg: #121212;
-  --export-btn-bg: #808e9b;
+  --export-btn-bg: #3498db;
   --export-icon: "🖼️";
   --animation-duration: 0.3s;
   --transition-duration: 0.2s;
   --spinner-color: var(--primary-color);
   --toast-bg: var(--primary-color);
   --toast-text: white;
+  --palette-border: #666;
+  --accent-color: #2ecc71;
 }
 
 body {
@@ -155,8 +159,8 @@ canvas {
 .control-group input[type="number"]:focus,
 .control-group select:focus {
   outline: none;
-  border-color: var(--primary-color);
-  box-shadow: 0 0 0 2px rgba(26, 54, 93, 0.2);
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 2px rgba(46, 204, 113, 0.2);
 }
 
 button {
@@ -193,7 +197,8 @@ button:active {
 }
 
 #exportBtn:hover {
-  background-color: var(--primary-color);
+  background-color: var(--accent-color);
+  transform: translateY(-2px);
 }
 
 .export-options {
@@ -213,7 +218,7 @@ button:active {
 }
 
 .export-option-btn:hover {
-  background-color: var(--primary-color);
+  background-color: var(--accent-color);
 }
 
 .modal {
@@ -268,7 +273,7 @@ button:active {
 }
 
 .close-btn:hover {
-  color: var(--primary-color);
+  color: var(--accent-color);
 }
 
 .toast {
@@ -306,4 +311,42 @@ footer {
   margin-top: auto;
   color: var(--text-color);
   font-size: 0.8rem;
+}
+
+/* Стили для выпадающего списка палитр */
+.control-group select {
+  background-color: var(--control-bg);
+  border: 1px solid var(--palette-border);
+  padding: 8px;
+  height: 36px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.control-group select:focus {
+  outline: none;
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 2px rgba(46, 204, 113, 0.2);
+}
+
+.control-group select option {
+  background-color: var(--control-bg);
+  color: var(--text-color);
+}
+
+/* Анимация для кнопок */
+button.pulse {
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
 }

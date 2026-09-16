@@ -1,85 +1,115 @@
-// Кэш для сохранения результатов рендеринга
-const cache = {}
+// Кэш в памяти для быстрого доступа
+const memoryCache = new Map();
 
-// Функция для кэширования результатов рендеринга
+// Функция для кэширования результатов рендеринга в памяти
 function cacheKey(fractalType, palette, iterations, zoom) {
-    return `${fractalType}_${palette}_${iterations}_${zoom}`;
+    return `${fractalType}_${palette.join('_')}_${iterations}_${zoom}`;
 }
 
-// Функция для получения кэшированных данных или рендеринга
+// Функция для получения кэшированных данных из памяти
 function getCachedData(fractalType, palette, iterations, zoom) {
     const key = cacheKey(fractalType, palette, iterations, zoom);
-    const cachedData = localStorage.getItem(key);
-    
-    if (cachedData) {
-        return JSON.parse(cachedData);
-    }
-    return null;
+    return memoryCache.get(key);
 }
 
-// Функция для сохранения рендеринга в кэш
-function saveToCache(key, data) {
-    localStorage.setItem(key, JSON.stringify(data));
+// Функция для сохранения рендеринга в кэш памяти
+function saveToMemoryCache(key, data) {
+    memoryCache.set(key, data);
 }
-// Основной рендеринг с кэшированием
-function renderFractalWithCache(canvas, fractalType, palette, iterations, zoom) {
+
+// Функция для рендеринга фрактала с использованием Web Worker
+function renderFractalWithWebWorker(canvas, fractalType, palette, iterations, zoom) {
     const ctx = canvas.getContext('2d');
     const width = canvas.width;
     const height = canvas.height;
-    const key = cacheKey(fractalType, palette.join('_'), iterations, zoom);
+    const key = cacheKey(fractalType, palette, iterations, zoom);
     
-    // Проверяем кэш
-    const cachedData = getCachedData(fractalType, palette.join('_'), iterations, zoom);
-    
-    // Анимация загрузки
-    const loadingAnimation = () => {
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
-        ctx.fillRect(0, 0, width, height);
-        
-        // Добавляем спиннер
-        ctx.beginPath();
-        ctx.arc(width / 2, height / 2, 15, 0, Math.PI * 2);
-        ctx.strokeStyle = 'var(--accent-color)';
-        ctx.lineWidth = 2;
-        ctx.stroke();
-    };
-    
-    // Если данные кэшированы, просто отрисовываем их
+    // Проверяем кэш памяти
+    const cachedData = getCachedData(fractalType, palette, iterations, zoom);
     if (cachedData) {
-        const imageData = ctx.createImageData(width, height);
-        const data = imageData.data;
-        
-        // Восстанавливаем данные из кэша
-        for (let i = 0; i < data.length; i += 4) {
-            data[i] = cachedData[i];
-            data[i + 1] = cachedData[i + 1];
-            data[i + 2] = cachedData[i + 2];
-            data[i + 3] = 255;
-        }
-        ctx.putImageData(imageData, 0, 0);
+        ctx.putImageData(cachedData, 0, 0);
         return;
     }
     
-    // Создаем ImageData для рендеринга
-    const imageData = ctx.createImageData(width, height);
-    const data = imageData.data;
+    // Создаем Web Worker для рендеринга
+    const worker = new Worker('scripts/fractalWorker.js');
     
-    // Основной алгоритм рендеринга
-    for (let y = 0; y < height; y++) {
-        for (let x = 0; x < width; x++) {
-            let real, imag;
-            if (fractalType === 'mandelbrot') {
-                real = -0.5 + (x / (width - 1)) * zoom;
-                imag = 0 + (y / (height - 1)) * zoom;
-            } else {
-                real = -1.5 + (x / (width - 1)) * 3;
-                imag = -1.5 + (y / (height - 1)) * 3;
+    // Отправляем данные в Worker
+    worker.postMessage({
+        fractalType,
+        palette,
+        iterations,
+        zoom,
+        width,
+        height
+    });
+    
+    // Обработчик сообщения от Worker
+    worker.onmessage = function(e) {
+        const result = e.data;
+        ctx.putImageData(result, 0, 0);
+        saveToMemoryCache(key, result); // Сохраняем в кэш
+    };
+    
+    // Обработчик ошибок
+    worker.onerror = function(error) {
+        console.error('Ошибка в Worker:', error);
+        // Падабэк: рендерим на основном потоке (без Web Worker)
+        const fallbackCtx = canvas.getContext('2d');
+        const fallbackImageData = fallbackCtx.createImageData(canvas.width, canvas.height);
+        const fallbackData = fallbackImageData.data;
+        for (let i = 0; i < fallbackData.length; i += 4) {
+            fallbackData[i] = 255;
+            fallbackData[i + 1] = 255;
+            fallbackData[i + 2] = 255;
+            fallbackData[i + 3] = 255;
+        }
+        fallbackCtx.putImageData(fallbackImageData, 0, 0);
+    };
+    };
+}
+// Удаляем старую функцию рендеринга с кэшированием в localStorage
+// Функция для рендеринга фрактала с использованием Web Worker
+function updateFractal() {
+    const canvas = document.getElementById('fractalCanvas');
+    const ctx = canvas.getContext('2d');
+    const palette = palettes[currentPalette];
+
+    // Анимация обновления
+    const updateAnimation = () => {
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        // Анимация прогресса
+        const progressImageData = ctx.createImageData(canvas.width, canvas.height);
+        const progressData = progressImageData.data;
+        
+        for (let y = 0; y < canvas.height; y++) {
+            for (let x = 0; x < canvas.width; x++) {
+                const progress = (y * canvas.width + x) / (canvas.width * canvas.height);
+                const index = (y * canvas.width + x) * 4;
+                progressData[index] = 255 * progress;
+                progressData[index + 1] = 255 * progress;
+                progressData[index + 2] = 255 * progress;
+                progressData[index + 3] = 255;
             }
-            
-            let zx = 0;
-            let zy = 0;
-            let xi = real;
-            let yi = imag;
+        }
+        ctx.putImageData(progressImageData, 0, 0);
+    };
+    
+    // Вызываем анимацию обновления
+    updateAnimation();
+    
+    // Рендерим фрактал с использованием Web Worker
+    renderFractalWithWebWorker(canvas, currentFractal, palette, iterations, zoom);
+    
+    // Микроинтерактивность: пульсация кнопки
+    const updateBtn = document.getElementById('updateBtn');
+    updateBtn.style.transform = 'scale(1.05)';
+    setTimeout(() => {
+        updateBtn.style.transform = 'scale(1)';
+    }, 200);
+}
             let iter = 0;
             
             while (zx * zx + zy * zy < 4 && iter < iterations) {
@@ -316,8 +346,55 @@ function updateFractal() {
     // Вызываем анимацию обновления
     updateAnimation();
     
-    // Рендерим фрактал с кэшированием
-    renderFractalWithCache(canvas, currentFractal, palette, iterations, zoom);
+// Функция для экспорта в SVG
+function exportToSVG() {
+    const canvas = document.getElementById('fractalCanvas');
+    const ctx = canvas.getContext('2d');
+    const width = canvas.width;
+    const height = canvas.height;
+    
+    // Создаем SVG элемент
+    const svgNS = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(svgNS, 'svg');
+    svg.setAttribute('width', width);
+    svg.setAttribute('height', height);
+    svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
+    
+    // Создаем группу для фрактала
+    const group = document.createElementNS(svgNS, 'g');
+    
+    // Создаем изображение из canvas
+    const img = document.createElementNS(svgNS, 'image');
+    img.setAttribute('x', '0');
+    img.setAttribute('y', '0');
+    img.setAttribute('width', width);
+    img.setAttribute('height', height);
+    img.setAttribute('href', canvas.toDataURL('image/png'));
+    
+    group.appendChild(img);
+    svg.appendChild(group);
+    
+    // Преобразуем SVG в строку
+    const serializer = new XMLSerializer();
+    let svgStr = serializer.serializeToString(svg);
+    
+    // Добавляем метаданные
+    svgStr = `<?xml version="1.0" standalone="no"?>
+<svg xmlns="${svgNS}" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
+    ${svgStr}
+</svg>`;
+    
+    // Создаем ссылку для скачивания
+    const svgBlob = new Blob([svgStr], { type: 'image/svg+xml' });
+    const svgUrl = URL.createObjectURL(svgBlob);
+    const svgLink = document.createElement('a');
+    svgLink.href = svgUrl;
+    svgLink.download = 'fractal.svg';
+    svgLink.click();
+    
+    // Удаляем временный URL
+    URL.revokeObjectURL(svgUrl);
+}
     
     // Микроинтерактивность: пульсация кнопки
     const updateBtn = document.getElementById('updateBtn');
@@ -513,30 +590,46 @@ const gifExport = () => {
     // Экспорт в PNG
     const pngLink = document.createElement('a');
     pngLink.download = 'fractal.png';
-    pngLink.href = canvas.toDataURL('image/png');
-    pngLink.click();
-    
-    // Анимация экспорта
-    const exportAnimation = () => {
-        const ctx = canvas.getContext('2d');
-        const imageData = ctx.createImageData(canvas.width, canvas.height);
-        const data = imageData.data;
+    // Экспорт фрактала
+    document.getElementById('exportBtn').addEventListener('click', () => {
+        const canvas = document.getElementById('fractalCanvas');
+        const exportFormat = document.getElementById('exportFormat').value;
         
-        for (let y = 0; y < canvas.height; y++) {
-            for (let x = 0; x < canvas.width; x++) {
-                const index = (y * canvas.width + x) * 4;
-                data[index] = 255;
-                data[index + 1] = 255;
-                data[index + 2] = 255;
-                data[index + 3] = 255;
+        // Анимация экспорта
+        const exportAnimation = () => {
+            const ctx = canvas.getContext('2d');
+            const imageData = ctx.createImageData(canvas.width, canvas.height);
+            const data = imageData.data;
+            
+            for (let y = 0; y < canvas.height; y++) {
+                for (let x = 0; x < canvas.width; x++) {
+                    const index = (y * canvas.width + x) * 4;
+                    data[index] = 255;
+                    data[index + 1] = 255;
+                    data[index + 2] = 255;
+                    data[index + 3] = 255;
+                }
             }
+            ctx.putImageData(imageData, 0, 0);
+            setTimeout(() => {
+                updateFractal();
+            }, 500);
+        };
+        exportAnimation();
+        // Вибрация на мобильных устройствах
+        if ('vibrate' in navigator) {
+            navigator.vibrate(100);
         }
-        ctx.putImageData(imageData, 0, 0);
-        setTimeout(() => {
-            updateFractal();
-        }, 500);
-    };
-    exportAnimation();
+        if (exportFormat === 'png') {
+            const pngLink = document.createElement('a');
+            pngLink.download = 'fractal.png';
+            pngLink.href = canvas.toDataURL('image/png');
+            pngLink.click();
+        } else if (exportFormat === 'svg') {
+            exportToSVG();
+        }
+    });
+
     
     // Экспорт в GIF
     const gifExport = () => {

@@ -237,12 +237,12 @@ function updateFractalFromPaintingMode(settings) {
 const paintingMode = PaintingMode.init();
 paintingMode.setFractalCallback(updateFractalFromPaintingMode);
     document.body.style.overflow = 'auto';
-  }
-
-  // Show loading complete message
-  function showLoadingComplete() {
-    loadingComplete.style.display = 'block';
-    setTimeout(() => {
+// Плавное появление canvas
+canvas.style.opacity = '0';
+canvas.style.transition = 'opacity 0.5s ease-in-out';
+setTimeout(() => {
+    canvas.style.opacity = '1';
+}, 300);
       loadingComplete.style.animation = 'fadeOut 1s ease-out forwards';
       setTimeout(() => {
         loadingComplete.style.display = 'none';

@@ -107,23 +107,39 @@ input, select, button {
 
 input[type="range"] {
     width: 100%;
-    margin-bottom: 10px;
-input[type="range"] {
-    width: 100%;
-    height: 6px;
+    height: 30px;
     margin: 8px 0;
     transition: all var(--transition-speed) ease;
+    background: var(--secondary-color);
+    border-radius: var(--border-radius);
+    outline: none;
 }
 
 input[type="range"]::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
-    width: 8px;
-    height: 8px;
+    width: 16px;
+    height: 16px;
     background-color: var(--accent-color);
     border-radius: 50%;
     box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);
     transition: transform var(--transition-speed) ease;
+    cursor: pointer;
+}
+
+input[type="range"]::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    background-color: var(--accent-color);
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+input[type="range"]::-webkit-slider-runnable-track {
+    height: 4px;
+    background: var(--secondary-color);
+    border-radius: var(--border-radius);
+    transition: background-color var(--transition-speed) ease;
 }
     appearance: none;
 button {
@@ -177,11 +193,59 @@ button#paintingModeBtn {
     gap: 8px;
     padding: 10px;
     width: 100%;
+    color: white;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
-button#paintingModeBtn:hover {
-    background-color: #ff5252;
-    transform: scale(1.02);
+.control-row {
+    margin-bottom: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: center;
+    width: 100%;
+}
+
+@media (min-width: 768px) {
+    .control-row {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        margin-bottom: 16px;
+    }
+}
+button#exportBtn {
+    background-color: var(--accent-color);
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all var(--transition-speed) ease;
+    will-change: transform;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px;
+    width: 100%;
+    color: white;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+button#exportBtn:hover {
+    background-color: #519fdf;
+    transform: translateY(-2px);
+}
+
+button#exportBtn:active {
+    transform: translateY(2px);
+}
+
+#export-complete {
+    color: #ffffff;
+    font-weight: bold;
+    transition: all var(--transition-speed) ease;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 button:hover {
     background-color: #519fdf;
@@ -391,19 +455,16 @@ button {
     transition: transform 0.5s ease-in-out;
     transform: scale(1);
     padding: 8px;
-    border-radius: var(--border-radius);
-    background-color: rgba(45, 55, 72, 0.7);
-    cursor: pointer;
-    font-size: 14px;
-.export-btn {
-    background-color: var(--accent-color);
-    border: none;
-    cursor: pointer;
-    font-weight: bold;
-    transition: all var(--transition-speed) ease;
-    will-change: transform;
-    display: flex;
-    align-items: center;
+@media (max-width: 1024px) {
+    button#paintingModeBtn {
+        font-size: 14px;
+        padding: 6px 12px;
+    }
+    .palette-option {
+        min-width: 30px;
+        font-size: 12px;
+    }
+}
     justify-content: center;
     gap: 8px;
     padding: 10px;

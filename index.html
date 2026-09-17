@@ -108,6 +108,77 @@
             border-radius: 12px;
         }
 
+        #loading > div {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        #loading.active > div {
+            opacity: 1;
+        }
+
+        #loading.hidden {
+            opacity: 0;
+        }
+
+        #loading > #loading-icon {
+            width: 60px;
+            height: 60px;
+            border: 4px solid var(--accent-color);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1.5s linear infinite;
+            margin-bottom: 1rem;
+        }
+
+        #loading > #loading-message {
+            color: var(--text-color);
+            font-size: 1.2rem;
+            margin-top: 1rem;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            text-align: center;
+            max-width: 300px;
+        }
+
+        #loading > #loading-button {
+            margin-top: 1.5rem;
+            padding: 12px 24px;
+            font-size: 1rem;
+            border-radius: var(--border-radius);
+            border: none;
+            cursor: pointer;
+            transition: all var(--transition-speed) ease;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            background: var(--palette-gradient);
+            color: #ffffff;
+            font-weight: bold;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        #loading > #loading-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+        }
+
+        #loading > #loading-button:disabled {
+            background: rgba(255, 255, 255, 0.2);
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        #success-message {
+            align-items: center;
+            flex-direction: column;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            border-radius: 12px;
+        }
+
         #loading h1 {
             color: var(--accent-color);
             font-size: 2.2rem;
@@ -123,6 +194,45 @@
             opacity: 0;
             transition: opacity 0.5s ease;
         }
+
+        #loading-message {
+            color: var(--text-color);
+            font-size: 1.2rem;
+            margin-top: 1rem;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            text-align: center;
+            max-width: 300px;
+        }
+
+        #loading-button {
+            margin-top: 1.5rem;
+            padding: 12px 24px;
+            font-size: 1rem;
+            border-radius: var(--border-radius);
+            border: none;
+            cursor: pointer;
+            transition: all var(--transition-speed) ease;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            background: var(--palette-gradient);
+            color: #ffffff;
+            font-weight: bold;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        #loading-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+        }
+
+        #loading-button:disabled {
+            background: rgba(255, 255, 255, 0.2);
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        #success-message {
 
         #success-message {
             position: fixed;
@@ -429,14 +539,17 @@
                 <div class="control-group">
                     <label for="depth">Recursion Depth:</label>
                     <input type="range" id="depth" min="10" max="100" value="50">
+                    <span id="depth-value">50</span>
                 </div>
                 <div class="control-group">
                     <label for="point-count">Point Count:</label>
                     <input type="range" id="point-count" min="500" max="2000" value="1000">
+                    <span id="point-count-value">1000</span>
                 </div>
                 <div class="control-group">
                     <label for="animation-speed">Animation Speed:</label>
                     <input type="range" id="animation-speed" min="0.1" max="2" step="0.1" value="1">
+                    <span id="animation-speed-value">1</span>
                 </div>
                 <div id="success-message" class="hidden">
                     <p>✨ Visualization complete! Enjoy the fractal!</p>
@@ -544,7 +657,54 @@
         });
 
 
-    <script src="https://cdn.jsdelivr.net/npm/gif.js@0.2.0/dist/gif.js"></script>
-    </script>
-    </body>
+<div id="loading">
+            <div>
+                <div id="loading-icon"></div>
+                <h1>Generating Fractal...</h1>
+                <p id="loading-message">Calculating fractal parameters...</p>
+                <button id="loading-button" disabled>Cancel</button>
+            </div>
+        </div>
+        <script src="https://cdn.jsdelivr.net/npm/gif.js@0.2.0/dist/gif.js"></script>
+        <script>
+            // Логика для кнопки Start Visualization
+            const startButton = document.getElementById('start-visualization-btn');
+            const loadingScreen = document.getElementById('loading');
+            const loadingButton = document.getElementById('loading-button');
+            let isVisualizationRunning = false;
+
+            startButton.addEventListener('click', function() {
+                if (!canvas.classList.contains('painting-mode')) {
+                    startButton.classList.add('loading');
+                    loadingScreen.classList.add('active');
+                    isVisualizationRunning = true;
+                    loadingButton.disabled = false;
+
+                    // Запускаем визуализацию
+                    init3DRender({ canvas });
+                    canvas.classList.add('painting-mode');
+
+                    // Скрываем индикатор после завершения визуализации
+                    setTimeout(() => {
+                        startButton.classList.remove('loading');
+                        loadingScreen.classList.remove('active');
+                        isVisualizationRunning = false;
+                        loadingButton.disabled = true;
+                    }, 5000); // Замените на реальное время завершения визуализации
+                }
+            });
+
+            // Логика для кнопки Cancel
+            loadingButton.addEventListener('click', function() {
+                if (isVisualizationRunning) {
+                    isVisualizationRunning = false;
+                    loadingScreen.classList.remove('active');
+                    startButton.classList.remove('loading');
+                    loadingButton.disabled = true;
+                    alert('Fractal generation cancelled.');
+                }
+            });
+        </script>
+
+        </body>
 </html>

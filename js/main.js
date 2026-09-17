@@ -106,8 +106,46 @@ const init3DRender = () => {
 // ===== Обновление фрактала =====
 const updateFractal = () => {
     console.log('Обновление фрактала:', { vertexCount, recursionDepth });
+    // Обновляем значения на слайдерах
+    document.getElementById('point-count-value').textContent = vertexCount;
+    document.getElementById('animation-speed-value').textContent = animationSpeed;
     // TODO: Реализовать обновление фрактала с новыми параметрами
 };
+
+// Обновление значений слайдеров в реальном времени
+const updateSliderValues = (e) => {
+    const targetId = e.target.id;
+    const valueElementId = `${targetId}-value`;
+    const valueElement = document.getElementById(valueElementId);
+    
+    if (targetId === 'point-count') {
+        vertexCount = parseInt(e.target.value);
+    } else if (targetId === 'animation-speed') {
+        animationSpeed = parseFloat(e.target.value);
+    }
+    
+    if (valueElement) {
+        valueElement.textContent = e.target.value;
+    }
+    updateFractal();
+};
+
+// Инициализация обработчиков событий для слайдеров
+const initSliderHandlers = () => {
+    const pointCountSlider = document.getElementById('point-count');
+    const animationSpeedSlider = document.getElementById('animation-speed');
+    
+    if (pointCountSlider) {
+        pointCountSlider.addEventListener('input', updateSliderValues);
+    }
+    
+    if (animationSpeedSlider) {
+        animationSpeedSlider.addEventListener('input', updateSliderValues);
+    }
+};
+
+// Запуск инициализации обработчиков
+initSliderHandlers();
 
 // ===== Экспорт анимации =====
 const exportAnimation = () => {

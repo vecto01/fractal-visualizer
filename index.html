@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fractal Visualizer</title>
+    <script src="https://cdn.jsdelivr.net/npm/gif.js@0.2.0/dist/gif.js"></script>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        :root {
+            --primary-color: #2d3748;
+            --secondary-color: #4a5568;
+            --accent-color: #38bdf8;
+            --text-color: #f5f7fa;
+            --border-radius: 8px;
+            --transition-speed: 0.4s;
+            --palette-gradient: linear-gradient(135deg, #38bdf8, #93c5fd);
+        }
+
+        /* Анимация загрузки */
+        .loading-spinner {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top-color: var(--accent-color);
+            animation: spin 1s ease-in-out infinite;
+            z-index: 1000;
+        }
+
+        @keyframes spin {
+            to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        .loading-message {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: var(--text-color);
+            font-size: 16px;
+            opacity: 0;
+            transition: opacity 0.4s ease-in-out;
+            z-index: 1000;
+        }
+
+        /* Адаптивность и темы */
+        @media (prefers-reduced-motion: reduce) {
+            * { transition: none !important; animation: none !important; }
+        }
+
+        * { box-sizing: border-box; }
+
+        [data-theme="light"] {
+            --primary-color: #f0f2f5;
+            --text-color: #2d3748;
+        }
+
+        [hidden] { display: none !important; }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--primary-color);
+            color: var(--text-color);
+            transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease;
+            min-height: 100vh;
+        }
+
+        /* Индикатор активности аудио */
+        .audio-indicator {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 8px 12px;
+            background: rgba(0, 0, 0, 0.5);
+            color: var(--accent-color);
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            z-index: 100;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+
+        body.audio-active .audio-indicator {
+            opacity: 1;
+        }
+
+        /* Анимация волны при клике */
+        .wave-animation {
+            animation: wave 0.8s ease-out forwards;
+        }
+
+        @keyframes wave {
+            0% {
+                transform: scale(1) translateY(0);
+            }
+            50% {
+                transform: scale(1.05) translateY(-10px);
+            }
+            100% {
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        /* Активность режима "Кинетическая живопись" */
+        .painting-mode-active {
+            animation: blink 1.5s infinite alternate;
+            filter: brightness(1.1);
+        }
+
+        @keyframes pulse {
+            from { opacity: 1; }
+            to { opacity: 0.9; }
+        }
+    </style>
+</head>
+<body>
+    <div id="loading-spinner" class="loading-spinner"></div>
+    <div id="loading-message" class="loading-message">Подготовка данных...</div>
+    <div id="audioIndicator" class="audio-indicator">AUDIO: 0</div>
+    <div id="app"></div>
+    <script>
+        // Показываем анимацию загрузки
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('loading-spinner').style.display = 'block';
+            document.getElementById('loading-message').style.display = 'block';
+            
+            // Скрываем анимацию после загрузки фрактала
+            window.addEventListener('fractalLoaded', function() {
+                document.getElementById('loading').classList.add('hidden');
+                setTimeout(() => {
+                    document.getElementById('successMessage').style.display = 'block';
+                    document.getElementById('successMessage').classList.add('success-animation');
+                }, 500);
+            });
+        });
+    </script>
+    <div id="successMessage" class="success-message">Готово!</div>
+</body>

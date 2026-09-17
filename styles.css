@@ -2,10 +2,10 @@
     --bg-color: #121212;
     --text-color: #e0e0e0; /* Улучшенная читаемость */
     --accent-color: #00a0ff;
-    --btn-bg: #2a2a2a;
-    --btn-text: #fff;
-    --btn-hover: #00a0ff; /* Ярче для наведения */
-    --btn-active: #0077cc; /* Ещё ярче при активности */
+    --btn-bg: #3a8fe8; /* Яркий акцентный цвет для кнопок */
+    --btn-text: #ffffff; /* Белый текст для максимального контраста */
+    --btn-hover: #0077cc; /* Ярче для наведения */
+    --btn-active: #005580; /* Ещё ярче при активности */
     --btn-active-text: #fff;
     --palette-bg: #2a2a2a;
     --palette-text: #fff;
@@ -273,8 +273,8 @@ button {
     margin: 10px 0;
     border: none;
     border-radius: 10px;
-    background-color: var(--accent-color);
-    color: #fff;
+    background-color: var(--btn-bg);
+    color: var(--btn-text);
     cursor: pointer;
     font-size: 16px;
     font-weight: 600;
@@ -284,8 +284,8 @@ button {
     display: inline-block;
     max-width: 300px;
     margin: 0 auto;
-    box-shadow: 0 3px 8px rgba(0, 160, 255, 0.4);
-    border: 1px solid rgba(0, 160, 255, 0.4);
+    box-shadow: 0 3px 8px rgba(58, 143, 232, 0.4);
+    border: 1px solid rgba(58, 143, 232, 0.4);
     position: relative;
     overflow: hidden;
     will-change: transform, box-shadow, opacity;
@@ -410,21 +410,22 @@ button#start-visualization-btn:active {
 }
 
 .success-message {
-    color: var(--accent-color);
+    color: var(--contrast-high);
     font-size: clamp(18px, 3vw, 24px);
     margin: 20px auto;
     opacity: 0;
-    animation: none;
     padding: 16px 24px;
-    background-color: rgba(0, 160, 255, 0.15);
+    background-color: rgba(42, 42, 42, 0.9); /* Темный фон для контраста */
     border-radius: 12px;
     display: block;
-    border: 1px solid rgba(0, 160, 255, 0.3);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-    max-width: 80%;
-    transition: all 0.3s ease;
+    border: 1px solid rgba(58, 143, 232, 0.3);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    max-width: 90%;
+    transition: all 0.5s ease;
     transform: translateY(20px);
+    animation: fadeInButton 0.5s ease forwards;
+    word-wrap: break-word; /* Для обертывания текста на узких экранах */
 }
 
 .success-message.active {
@@ -500,7 +501,7 @@ button.fade-in:nth-child(3) {
     width: 100%;
     height: 6px;
     -webkit-appearance: none;
-    background: rgba(0, 160, 255, 0.3);
+    background: rgba(58, 143, 232, 0.3);
     border-radius: 3px;
     outline: none;
     margin-bottom: 8px;
@@ -510,7 +511,7 @@ button.fade-in:nth-child(3) {
     -webkit-appearance: none;
     width: 20px;
     height: 20px;
-    background: var(--accent-color);
+    background: var(--btn-bg);
     border-radius: 50%;
     cursor: pointer;
     box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.4);
@@ -518,7 +519,7 @@ button.fade-in:nth-child(3) {
 }
 
 .slider-container input[type="range"]:focus-visible::-webkit-slider-thumb {
-    box-shadow: 0 0 0 6px rgba(0, 160, 255, 0.7);
+    box-shadow: 0 0 0 6px rgba(58, 143, 232, 0.7);
     transform: scale(1.3);
 }
 
@@ -541,6 +542,12 @@ button.fade-in:nth-child(3) {
     margin-top: 10px;
 }
 
+.sliders-container {
+    width: 100%;
+    margin-top: 20px;
+    padding: 20px 0;
+}
+
 .fixed-buttons button {
     width: 120px;
     padding: 12px;
@@ -548,6 +555,51 @@ button.fade-in:nth-child(3) {
     min-width: 120px;
     box-sizing: border-box;
     transition: all 0.3s ease;
+
+    /* Адаптивность для мобильных устройств */
+    @media (max-width: 768px) {
+        .slider-container {
+            width: 100%;
+            margin-bottom: 1.5rem;
+        }
+        .slider-container input[type="range"] {
+            width: 100%;
+            height: 8px;
+        }
+        .fixed-buttons button {
+            width: 100%;
+            margin-bottom: 0.5rem;
+        }
+    }
+}
+
+/* Адаптивность для мобильных устройств */
+@media (max-width: 768px) {
+    .success-message {
+        max-width: 95%;
+        padding: 12px 16px;
+        font-size: clamp(16px, 4vw, 18px);
+    }
+    
+    .fixed-buttons button {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+    
+    .sliders-container {
+        width: 100%;
+        margin-bottom: 20px;
+    }
+    
+    .slider-container {
+        width: 100%;
+        margin-bottom: 15px;
+    }
+    
+    .slider-container input[type="range"] {
+        width: 100%;
+        height: 8px;
+    }
 }
 
 /* Стили фокуса для кнопок и слайдеров */

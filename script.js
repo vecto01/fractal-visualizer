@@ -48,6 +48,109 @@ function updateText() {
     if (languageToggle) {
         const t = translations[currentLanguage];
         const flagSpan = document.createElement('span');
+
+    // Функция для управления анимацией загрузки и появлением элементов
+    function setupLoadingAnimation() {
+        const loadingSpinner = document.querySelector('.loading-spinner');
+        const loadingMessage = document.querySelector('.loading-message');
+        const successMessage = document.querySelector('#success-message');
+        const buttonsContainer = document.querySelector('.fixed-buttons');
+        const slidersContainer = document.querySelector('.sliders-container');
+        const fractalCanvas = document.querySelector('#fractal-canvas');
+
+        // Показываем лоудер и сообщение
+        loadingSpinner.classList.add('active');
+        loadingMessage.classList.add('active');
+
+        // Скрываем кнопку Start и показываем лоудер
+        const startButton = document.querySelector('#start-visualization-btn');
+        startButton.classList.add('loading');
+
+        // Задержка для симуляции загрузки
+        setTimeout(() => {
+            // Скрываем лоудер и сообщение
+            loadingSpinner.classList.remove('active');
+            loadingMessage.classList.remove('active');
+
+            // Показываем элементы плавно
+            successMessage.style.opacity = '0';
+            successMessage.style.transform = 'translateY(20px)';
+            successMessage.classList.add('active');
+
+            // Показываем кнопки и слайдеры
+            buttonsContainer.style.opacity = '0';
+            buttonsContainer.style.transform = 'translateY(20px)';
+            buttonsContainer.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+            setTimeout(() => {
+                buttonsContainer.style.opacity = '1';
+                buttonsContainer.style.transform = 'translateY(0)';
+            }, 10);
+
+            // Показываем слайдеры
+            slidersContainer.style.opacity = '0';
+            slidersContainer.style.transform = 'translateY(20px)';
+            slidersContainer.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+            setTimeout(() => {
+                slidersContainer.style.opacity = '1';
+                slidersContainer.style.transform = 'translateY(0)';
+            }, 10);
+
+            // Показываем кнопку Start
+            startButton.classList.remove('loading');
+        }, 2000); // Симуляция загрузки (2 секунды)
+    }
+
+    // Инициализация анимации загрузки при загрузке страницы
+    window.addEventListener('load', () => {
+        setupLoadingAnimation();
+    });
+
+    // Фиксация кнопок и слайдеров на мобильных устройствах
+    function setupStickyButtons() {
+        const buttonsContainer = document.querySelector('.fixed-buttons');
+        const slidersContainer = document.querySelector('.sliders-container');
+        
+        // Фиксируем кнопки на мобильных устройствах
+        if (window.innerWidth <= 768) {
+            buttonsContainer.style.position = 'fixed';
+            buttonsContainer.style.bottom = '20px';
+            buttonsContainer.style.left = '0';
+            buttonsContainer.style.right = '0';
+            buttonsContainer.style.width = '100%';
+            buttonsContainer.style.zIndex = '100';
+            buttonsContainer.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+            buttonsContainer.style.padding = '10px';
+            buttonsContainer.style.borderRadius = '10px 10px 0 0';
+            buttonsContainer.style.boxShadow = '0 -2px 10px rgba(0, 0, 0, 0.3)';
+        } else {
+            buttonsContainer.style.position = 'static';
+            buttonsContainer.style.backgroundColor = 'transparent';
+            buttonsContainer.style.boxShadow = 'none';
+        }
+        
+        // Фиксируем слайдеры на мобильных устройствах
+        if (window.innerWidth <= 768) {
+            slidersContainer.style.position = 'fixed';
+            slidersContainer.style.bottom = '120px';
+            slidersContainer.style.left = '0';
+            slidersContainer.style.right = '0';
+            slidersContainer.style.width = '100%';
+            slidersContainer.style.zIndex = '90';
+            slidersContainer.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
+            slidersContainer.style.padding = '10px';
+            slidersContainer.style.borderRadius = '10px';
+            slidersContainer.style.boxShadow = '0 -2px 10px rgba(0, 0, 0, 0.3)';
+        } else {
+            slidersContainer.style.position = 'static';
+            slidersContainer.style.backgroundColor = 'transparent';
+            slidersContainer.style.boxShadow = 'none';
+        }
+    }
+
+    // Обновляем фиксацию при изменении размера окна
+    window.addEventListener('resize', () => {
+        setupStickyButtons();
+    });
         flagSpan.textContent = t.languageFlag;
         flagSpan.className = 'language-flag';
         

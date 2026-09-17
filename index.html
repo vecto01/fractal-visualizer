@@ -1,11 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Fractal Visualizer</title>
-    <script src="https://cdn.jsdelivr.net/npm/gif.js@0.2.0/dist/gif.js"></script>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="css/styles.css">
     <style>
         :root {
             --primary-color: #2d3748;
@@ -31,6 +30,30 @@
             border-top-color: var(--accent-color);
             animation: spin 1s ease-in-out infinite;
             z-index: 1000;
+        }
+
+        /* Анимация завершения загрузки */
+        .final-animation {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100px;
+            height: 100px;
+            background-color: var(--accent-color);
+            border-radius: 50%;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+            z-index: 1000;
+        }
+        
+        .final-animation.flash {
+            animation: flash 0.5s infinite alternate;
+        }
+        
+        @keyframes flash {
+            from { opacity: 0.8; }
+            to { opacity: 1; }
         }
 
         @keyframes spin {
@@ -123,27 +146,46 @@
             to { opacity: 0.9; }
         }
     </style>
-</head>
-<body>
-    <div id="loading-spinner" class="loading-spinner"></div>
-    <div id="loading-message" class="loading-message">Подготовка данных...</div>
-    <div id="audioIndicator" class="audio-indicator">AUDIO: 0</div>
-    <div id="app"></div>
     <script>
         // Показываем анимацию загрузки
         document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('loading-spinner').style.display = 'block';
             document.getElementById('loading-message').style.display = 'block';
             
-            // Скрываем анимацию после загрузки фрактала
+            // Скрываем анимацию загрузки и показываем финальную анимацию
             window.addEventListener('fractalLoaded', function() {
-                document.getElementById('loading').classList.add('hidden');
+                document.getElementById('loading-spinner').style.display = 'none';
+                document.getElementById('loading-message').style.display = 'none';
+                
+                // Показываем финальную анимацию
+                const finalAnimation = document.getElementById('finalAnimation');
+                finalAnimation.style.display = 'block';
+                finalAnimation.classList.add('flash');
+                
                 setTimeout(() => {
-                    document.getElementById('successMessage').style.display = 'block';
-                    document.getElementById('successMessage').classList.add('success-animation');
-                }, 500);
+                    finalAnimation.style.opacity = '0';
+                    setTimeout(() => {
+                        finalAnimation.style.display = 'none';
+                        document.getElementById('successMessage').style.display = 'block';
+                        document.getElementById('successMessage').classList.add('success-animation');
+                    }, 500);
+                }, 1000);
             });
         });
     </script>
-    <div id="successMessage" class="success-message">Готово!</div>
+    <body>
+    <div id="loading"></div>
+    <div id="app"></div>
+    <button id="toggle3DModeBtn">Переключить на 3D</button>
+    <button id="paintingModeBtn">Кинетическая живопись</button>
+    <div id="audioIndicator" class="audio-indicator">AUDIO: 0</div>
+<script src="js/animations.js"></script>
+<script src="js/main.js"></script>
+<script>
+        // Проверка на отключение анимаций
+        const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (prefersReducedMotion) {
+            document.body.classList.add('no-animations');
+        }
+    </script>
 </body>

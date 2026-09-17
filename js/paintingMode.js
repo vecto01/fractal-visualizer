@@ -58,6 +58,12 @@ class PaintingModeSync {
         this.targetZoom = 1 + (avg / 255) * 0.3 * speedFactor;
         this.targetRotation = Math.sin(timestamp / 1500 * speedFactor) * 0.05;
 
+        // Обновление аудиоэффектов для 3D-рендера
+        if (window.update3DAudioEffect) {
+            const audioIntensity = avg / 255;
+            window.update3DAudioEffect(audioIntensity);
+        }
+
         // Сглаживание параметров
         this.fractal.updateParams({
             zoom: this.fractal.params.zoom + (this.targetZoom - this.fractal.params.zoom) * this.smoothFactor,

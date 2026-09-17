@@ -58,6 +58,27 @@
     box-sizing: border-box;
     position: relative;
     display: inline-flex;
+
+.btn {
+    background-color: var(--btn-bg);
+    color: var(--btn-text);
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-weight: 500;
+    margin-top: 10px;
+    display: inline-block;
+    text-align: center;
+    width: 200px;
+}
+
+.btn:hover {
+    background-color: var(--btn-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.4);
+}
     align-items: center;
     justify-content: center;
 }
@@ -254,16 +275,25 @@ canvas:hover {
     opacity: 0.9;
     margin-bottom: 1rem;
     will-change: transform;
+    animation: spin 1.5s linear infinite;
 }
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
 
 #loading-message {
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    color: var(--text-color);
-    font-size: 16px;
-    opacity: 1;
+    color: var(--contrast-high);
+    font-size: 18px;
+    font-weight: 600;
+    text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+#loading-message {
+#loading-message {
     transition: opacity var(--transition-speed) ease-out forwards;
 }
 
@@ -272,8 +302,9 @@ canvas:hover {
 }
 
 #loading.hidden {
-    display: none;
     opacity: 0;
+    animation: fadeOut 0.5s ease-out forwards;
+}
     animation: none;
 }
 

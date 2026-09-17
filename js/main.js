@@ -1,6 +1,177 @@
-// ===== Основная логика приложения ====
+// ===== Основная логика приложения =====
+
+// Импорт модулей
 import { Fractal } from './fractal.js';
 import PaintingModeSync from './paintingMode_new.js';
+import { init3DScene } from './3d/fractal3d.js';
+import { centerElement, animateLoadingCircle, animateText } from './animations.js';
+
+// Инициализация элементов
+const loadingCircle = document.getElementById('loading-circle');
+const textReady = document.getElementById('ready-text');
+
+// Центрируем круг при загрузке
+if (loadingCircle) {
+  centerElement(loadingCircle);
+  animateLoadingCircle(loadingCircle);
+}
+
+
+// Объекты для хранения сцен
+let currentScene = null;
+let currentRenderer = null;
+let fractalWorker = null;
+
+// Флаг активного режима
+let is3DMode = false;
+
+// ===== ОБРАБОТКА ОШИБОК ====
+const handleError = (error) => {
+    console.error("Ошибка в приложении:", error);
+    alert("Произошла ошибка. Проверьте совместимость браузера или обновите страницу.");
+};
+
+// ===== ПЕРЕКЛЮЧЕНИЕ РЕЖИМОВ ====
+const toggle3DMode = () => {
+    try {
+        if (is3DMode) {
+            // Возврат в 2D режим
+            const canvas = document.getElementById('fractalCanvas');
+            canvas.style.display = 'block';
+            document.getElementById('app').innerHTML = '';
+            const mountPoint = document.getElementById('app');
+            mountPoint.appendChild(canvas);
+            
+            // Перезапуск 2D фрактала
+            initFractal();
+        } else {
+            // Переход в 3D режим
+            const canvas = document.getElementById('fractalCanvas');
+            canvas.style.display = 'none';
+            
+            // Проверка поддержки WebGL
+            const canvas3D = document.createElement('canvas');
+            const gl = canvas3D.getContext('webgl');
+            if (!gl) {
+                alert("Ваш браузер не поддерживает WebGL. Переключаемся на 2D-режим.");
+                initFractal();
+                return;
+            }
+            
+            init3DScene();
+            
+            // Если активен режим "Кинетическая живопись", синхронизируем аудиоэффекты
+            if (paintingModeInstance && paintingModeInstance.isActive) {
+                paintingModeInstance.updateFractal(performance.now());
+            }
+        }
+        is3DMode = !is3DMode;
+    } catch (error) {
+        handleError(error);
+        // Возврат в 2D режим при ошибке
+        const canvas = document.getElementById('fractalCanvas');
+        canvas.style.display = 'block';
+        document.getElementById('app').innerHTML = '';
+        const mountPoint = document.getElementById('app');
+        mountPoint.appendChild(canvas);
+        initFractal();
+    }
+};
+
+// ===== ИНИЦИАЛИЗАЦИЯ ФРАКТАЛА ====
+const initFractal = () => {
+    showLoading();
+    const canvas = document.getElementById('fractalCanvas');
+    const ctx = canvas.getContext('2d');
+    
+    // Создаём Worker для рендеринга фрактала
+    fractalWorker = new Worker('js/fractalWorker.js');
+    
+    // Обработчик сообщений от Worker
+    fractalWorker.onmessage = function(e) {
+        try {
+            if (e.data.type === 'fractalRenderedWithAudio') {
+                ctx.putImageData(e.data.data, 0, 0);
+                updateAudioVisualFeedback(e.data.audioData);
+            } else {
+                ctx.putImageData(e.data, 0, 0);
+            }
+        } catch (error) {
+            handleError(error);
+        }
+    };
+    
+    // Параметры для Worker
+    const params = {
+        width: canvas.width,
+        height: canvas.height,
+        maxIterations: 100,
+        zoom: 1.0,
+        offsetX: canvas.width / 2,
+        offsetY: canvas.height / 2
+    };
+    
+    // Отправляем параметры в Worker
+    fractalWorker.postMessage({ params });
+    
+    // Инициализация обработки аудио
+    fractalWorker.postMessage({
+        type: 'initAudioWorker',
+        audioData: {
+            bass: 0,
+            mid: 0,
+            treble: 0
+        },
+        params
+    });
+    
+    // Функция для инициализации режима "Кинетическая живопись"
+    const initPaintingMode = ({ canvas }) => {
+        const fractal = new Fractal(canvas);
+        const paintingMode = new PaintingModeSync(fractal);
+        return paintingMode;
+    };
+    
+    // Инициализация режима "Кинетическая живопись"
+    const paintingModeInstance = initPaintingMode({ canvas });
+    
+    // Скрыть состояние загрузки
+    hideLoading();
+    
+    // Обработчик для кнопки "Кинетическая живопись"
+    const paintingModeBtn = document.getElementById('paintingModeBtn');
+    paintingModeBtn.addEventListener('click', () => {
+        if (paintingModeBtn.classList.contains('active')) {
+            paintingModeInstance.deactivate();
+            paintingModeBtn.classList.remove('active');
+        } else {
+            paintingModeInstance.activate();
+            paintingModeBtn.classList.add('active');
+        }
+    });
+    
+    // Обработчик для кнопки переключения режима
+    document.getElementById('toggle3DModeBtn').addEventListener('click', toggle3DMode);
+    
+    // Запуск анимации волны при клике на канвас
+    canvas.addEventListener('click', (e) => {
+        if (e.target === canvas) {
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            // Передаём координаты клика в режим "Кинетическая живопись"
+            paintingModeInstance.handleCanvasClick(x, y);
+            console.log('Клик на канвас! Координаты:', x, y);
+            
+            // Анимация волны
+            canvas.classList.add('wave-animation');
+            setTimeout(() => {
+                canvas.classList.remove('wave-animation');
+            }, 800);
+        }
+    });
+};
 
 // Функция для отображения визуального индикатора активности
 const updateAudioVisualFeedback = (audioData) => {
@@ -30,10 +201,6 @@ if (prefersReducedMotion) {
     console.log('Анимации отключены для пользователя');
     document.body.classList.add('no-animations');
 }
-window.updateFractal = (params) => {
-    const fractalWorker = new Worker('js/fractalWorker.js');
-    fractalWorker.postMessage({ params });
-}
 
 // Отладочная функция для проверки состояния загрузки
 const debugLoadingState = () => {
@@ -58,171 +225,5 @@ const hideLoading = () => {
     debugLoadingState();
 };
 
-// Инициализация фрактала
-const initFractal = () => {
-    console.log('Initializing fractal...');
-    showLoading();
-
-    const canvas = document.getElementById('fractalCanvas');
-    const ctx = canvas.getContext('2d');
-    
-    // Создаём Worker для рендеринга фрактала
-    const fractalWorker = new Worker('js/fractalWorker.js');
-    
-    // Обработчик сообщений от Worker
-    fractalWorker.onmessage = function(e) {
-        if (e.data.type === 'fractalRenderedWithAudio') {
-            ctx.putImageData(e.data.data, 0, 0);
-            updateAudioVisualFeedback(e.data.audioData);
-        } else {
-            ctx.putImageData(e.data, 0, 0);
-        }
-    };
-    
-    // Параметры для Worker
-    const params = {
-        width: canvas.width,
-        height: canvas.height,
-        maxIterations: 100,
-        zoom: 1.0,
-        offsetX: canvas.width / 2,
-        offsetY: canvas.height / 2
-    };
-    
-    // Отправляем параметры в Worker
-    fractalWorker.postMessage({ params });
-    
-    // Инициализация обработки аудио
-    fractalWorker.postMessage({
-        type: 'initAudioWorker',
-        audioData: {
-            bass: 0,
-            mid: 0,
-            treble: 0
-        },
-        params
-    });
-    
-    // Запуск анимации волны при клике на канвас
-    canvas.addEventListener('click', (e) => {
-        if (e.target === canvas) {
-            const rect = canvas.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-            
-            // Передаём координаты клика в режим "Кинетическая живопись"
-            paintingModeInstance.handleCanvasClick(x, y);
-            console.log('Клик на канвас! Координаты:', x, y);
-            
-            // Анимация волны
-            canvas.classList.add('wave-animation');
-            setTimeout(() => {
-                canvas.classList.remove('wave-animation');
-            }, 800);
-        }
-    });
-    
-    // Функция для инициализации режима "Кинетическая живопись"
-    const initPaintingMode = ({ canvas }) => {
-        const fractal = new Fractal(canvas);
-        const paintingMode = new PaintingModeSync(fractal);
-        return paintingMode;
-    };
-
-    // Инициализация режима "Кинетическая живопись"
-    const paintingModeInstance = initPaintingMode({ canvas });
-    
-    // Скрыть состояние загрузки после инициализации
-
-    // Обработчик для кнопки "Кинетическая живопись"
-    paintingModeBtn.addEventListener('click', () => {
-        if (paintingModeBtn.classList.contains('active')) {
-            paintingModeInstance.deactivate();
-            paintingModeBtn.classList.remove('active');
-        } else {
-            paintingModeInstance.activate();
-            paintingModeBtn.classList.add('active');
-        }
-    });
-    setTimeout(() => {
-        hideLoading();
-    }, 1500);
-    
-    // Обработчик для кнопки "Кинетическая живопись"
-    paintingModeBtn.addEventListener('click', () => {
-        if (paintingModeBtn.classList.contains('active')) {
-            paintingModeInstance.deactivate();
-            paintingModeBtn.classList.remove('active');
-        } else {
-            paintingModeInstance.activate();
-            paintingModeBtn.classList.add('active');
-        }
-    });
-};
-
-// Экспорт фрактала как GIF
-const exportAsGif = () => {
-    const canvas = document.getElementById('fractalCanvas');
-    const gifProgressBar = document.getElementById('gifProgressBar');
-    const gifProgress = document.getElementById('gifProgress');
-    const gifProgressText = document.getElementById('gifProgressText');
-    
-    gifProgressBar.style.display = 'block';
-    gifProgressText.style.display = 'none';
-    gifProgress.style.width = '0%';
-    
-    // Создаём экземпляр GIF
-    const gif = new GIF({
-        width: canvas.width,
-        height: canvas.height,
-        workers: 2,
-        quality: 10,
-        repeat: 0,
-        frameDelay: 100,
-        render: function(currentFrameTime) {
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(canvas, 0, 0);
-            gif.addFrame(ctx);
-        }
-    });
-    
-    // Отслеживаем прогресс
-    gif.on('frame', (frame) => {
-        const progress = (frame.frame / gif.frames) * 100;
-        gifProgress.style.width = `${progress}%`;
-        gifProgressText.textContent = `Загрузка: ${Math.round(progress)}%`;
-        gifProgressText.style.display = 'block';
-        gifProgressBar.style.display = 'block';
-    });
-    
-    gif.on('finished', (blob) => {
-        gifProgressBar.style.display = 'none';
-        gifProgressText.style.display = 'block';
-        gifProgress.style.width = '100%';
-        
-        // Сохраняем GIF
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'fractal.gif';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-    });
-    
-    gif.on('error', (error) => {
-        gifProgressBar.style.display = 'none';
-        gifProgressText.style.display = 'none';
-        gifProgress.style.width = '0%';
-        console.error('Ошибка экспорта:', error);
-    });
-    
-    // Запускаем экспорт
-    gif.render();
-};
-
 // Запуск инициализации
 initFractal();
-
-// Экспорт экземпляра paintingModeInstance в глобальную область видимости
-window.paintingModeInstance = paintingModeInstance;

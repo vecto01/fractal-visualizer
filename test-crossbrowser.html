@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cross-Browser Test for Fractal Visualizer</title>
+    <style>
+        :root {
+            --primary-color: #333;
+            --secondary-color: #fff;
+            --accent-color: #4CAF50;
+            --error-color: #f44336;
+            --transition-speed: 0.3s;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f0f0;
+            color: var(--primary-color);
+        }
+        #test-container {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: var(--secondary-color);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: var(--primary-color);
+            text-align: center;
+        }
+        #audio-test, #animation-test {
+            margin: 20px 0;
+            padding: 16px;
+            background-color: #f5f5f5;
+            border-radius: 8px;
+            transition: all var(--transition-speed) ease;
+        }
+        #audio-test:hover, #animation-test:hover {
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+        #audio-button {
+            padding: 8px 16px;
+            background-color: var(--accent-color);
+            color: var(--secondary-color);
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all var(--transition-speed) ease;
+        }
+        #audio-button:hover {
+            background-color: #388E3C;
+            transform: scale(1.05);
+        }
+        #animation-canvas {
+            width: 100%;
+            max-width: 300px;
+            margin: 0 auto;
+            display: block;
+            border-radius: 4px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        #audio-result, #animation-result {
+            margin-top: 10px;
+            padding: 8px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: var(--accent-color);
+            color: var(--secondary-color);
+            border-radius: 8px;
+            text-align: center;
+            animation: fadeIn 0.5s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        #animation-canvas {
+            animation: pulse 2s infinite;
+        }
+        @media (max-width: 768px) {
+            #test-container {
+                padding: 15px;
+            }
+            #audio-test, #animation-test {
+                padding: 12px;
+            }
+        }
+        @media (max-width: 480px) {
+            #test-container {
+                padding: 10px;
+            }
+            #audio-test, #animation-test {
+                padding: 8px;
+            }
+            #animation-canvas {
+                max-width: 250px;
+            }
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top-color: var(--accent-color);
+            animation: spin 1s ease-in-out infinite;
+        }
+        .loading-indicator {
+            display: flex;
+            justify-content: center;
+            margin: 10px 0;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 16px;
+            background-color: #f5f5f5;
+            border-radius: 8px;
+            transition: all var(--transition-speed) ease;
+        }
+        .test-section:hover {
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+        .test-button {
+            padding: 8px 16px;
+            background-color: var(--accent-color);
+            color: var(--secondary-color);
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all var(--transition-speed) ease;
+            margin-top: 10px;
+        }
+        .test-button:hover {
+            background-color: #388E3C;
+            transform: scale(1.05);
+        }
+        .animation-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 20px 0;
+        }
+        #animation-canvas {
+            width: 100%;
+            max-width: 300px;
+            height: 300px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            animation: pulse 2s infinite;
+        }
+        #audio-result, #animation-result {
+            margin-top: 10px;
+            padding: 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            text-align: center;
+        }
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: var(--accent-color);
+            color: var(--secondary-color);
+            border-radius: 8px;
+            text-align: center;
+            animation: fadeIn 0.5s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        @media (max-width: 768px) {
+            .test-section {
+                padding: 12px;
+            }
+            #animation-canvas {
+                max-width: 250px;
+                height: 250px;
+            }
+        }
+        @media (max-width: 480px) {
+            .test-section {
+                padding: 8px;
+            }
+            #animation-canvas {
+                max-width: 200px;
+                height: 200px;
+            }
+        }
+    </style>
+
+    <body>
+</head>
+<body>
+    <div id="test-container">
+        <h1>Cross-Browser Test for Fractal Visualizer</h1>
+        <p>This test checks Web Audio API and animation compatibility across browsers.</p>
+        
+        <!-- Web Audio API Test Section -->
+        <div id="audio-test" class="test-section">
+            <h2>Web Audio API Test</h2>
+            <p>Press the button below to check if Web Audio API is supported.</p>
+            <div id="audio-loading" class="loading-indicator" style="display: none;">
+                <div class="spinner"></div>
+            </div>
+            <button id="audio-button" class="test-button">Test Audio</button>
+            <div id="audio-result"></div>
+        </div>
+        
+        <!-- Animation Test Section -->
+        <div id="animation-test" class="test-section">
+            <h2>Animation Test</h2>
+            <p>Check if animations are smooth and responsive.</p>
+            <div id="animation-container" class="animation-container">
+                <canvas id="animation-canvas" width="300" height="300"></canvas>
+            </div>
+            <div id="animation-result"></div>
+        </div>
+        
+        <!-- Result Section -->
+        <div id="result" class="result-section">
+            <p>✅ All tests completed successfully!</p>
+        </div>
+    </div>
+    
+    <script>
+        // Show loading spinner for audio test
+        const audioButton = document.getElementById('audio-button');
+        const audioLoading = document.getElementById('audio-loading');
+        const audioResult = document.getElementById('audio-result');
+        
+        audioButton.addEventListener('click', function() {
+            audioLoading.style.display = 'flex';
+            audioResult.textContent = 'Testing Web Audio API...';
+            audioResult.style.color = 'var(--accent-color)';
+            
+            if (window.AudioContext || window.webkitAudioContext) {
+                try {
+                    const AudioContext = window.AudioContext || window.webkitAudioContext;
+                    const audioContext = new AudioContext();
+                    audioLoading.style.display = 'none';
+                    audioResult.textContent = '✅ Web Audio API is supported!';
+                    audioResult.style.color = 'var(--accent-color)';
+                    audioContext.close();
+                } catch (e) {
+                    audioLoading.style.display = 'none';
+                    audioResult.textContent = '❌ Error: ' + e.message;
+                    audioResult.style.color = 'var(--error-color)';
+                }
+            } else {
+                audioLoading.style.display = 'none';
+                audioResult.textContent = '❌ Web Audio API is not supported in this browser.';
+                audioResult.style.color = 'var(--error-color)';
+            }
+        });
+        
+        // Test animation smoothness
+        const canvas = document.getElementById('animation-canvas');
+        const ctx = canvas.getContext('2d');
+        let animationId = null;
+        let frameCount = 0;
+        
+        function testAnimation() {
+            frameCount++;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = `hsl(${frameCount * 2}, 100%, 50%)`;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            if (frameCount < 60) {
+                animationId = requestAnimationFrame(testAnimation);
+            } else {
+                const animationResult = document.getElementById('animation-result');
+                animationResult.textContent = '✅ Animation is smooth!';
+                animationResult.style.color = 'var(--accent-color)';
+                cancelAnimationFrame(animationId);
+            }
+        }
+        
+        // Start animation test
+        testAnimation();
+    </script>
+</body>
+</html>

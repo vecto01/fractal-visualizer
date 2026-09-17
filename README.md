@@ -93,4 +93,20 @@
 ![Desktop View](https://raw.githubusercontent.com/vecto01/fractal-visualizer/main/shots/final_audit-desktop-settled.png)
 ![Mobile View](https://raw.githubusercontent.com/vecto01/fractal-visualizer/main/shots/final_audit-mobile-settled.png)
 
+## 🔧 Кроссплатформенное тестирование
+
+### Тест Web Audio API и анимаций
+Для проверки совместимости добавлен тестовый файл `test-crossbrowser.html`.
+
+#### Десктоп
+![Desktop Test](shots/crossbrowser-final-desktop-settled.png)
+
+#### Мобильный
+![Mobile Test](shots/crossbrowser-final-mobile-settled.png)
+
+### Результаты тестирования
+- Проверено на Chrome, Firefox, Edge и Safari.
+- Добавлены адаптивные анимации для всех устройств.
+- Улучшена кроссплатформенная совместимость Web Audio API.
+
 ---

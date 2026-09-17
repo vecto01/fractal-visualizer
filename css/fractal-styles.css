@@ -40,6 +40,93 @@ canvas.loaded {
 }
 
 canvas.painting-mode {}
+
+/* Добавляем стили для .success-message */
+.success-message {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    color: #FFFFFF;
+    padding: 20px;
+    margin-top: 20px;
+    text-align: center;
+    background-color: #2d3748;
+    transform: translate(-50%, -50%);
+    animation: fadeInSuccess 0.5s ease-out;
+    z-index: 1000;
+}
+
+.success-message.show {
+    display: block;
+}
+
+@keyframes fadeInSuccess {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.8);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+}
+
+.scroll-effect {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100px;
+    height: 100px;
+    background: linear-gradient(135deg, #38bdf8, #93c5fd);
+    border-radius: 50%;
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+    z-index: 1000;
+    pointer-events: none;
+}
+
+.scroll-effect.active {
+    opacity: 1;
+    animation: pulseScroll 1.5s ease-out infinite;
+}
+
+@keyframes pulseScroll {
+    0% { transform: translateX(-50%) scale(1); }
+    50% { transform: translateX(-50%) scale(1.1); }
+    100% { transform: translateX(-50%) scale(1); }
+}
+
 canvas:hover {
     filter: brightness(1.05);
+}
+
+/* Адаптивные стили для кнопок */
+button {
+    padding: 12px 20px;
+    margin: 10px;
+    background-color: #4a90e2;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+button:hover {
+    background-color: #357abd;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+button:active {
+    transform: translateY(1px);
+}
+
+button.active {
+    background-color: #ffd700;
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
 }

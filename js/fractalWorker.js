@@ -1,34 +1,29 @@
 // Файл для рендеринга фракталов в Web Worker
-// Интеграция с audioWorker.js для обработки аудио
-
-let audioWorker;
+// Обработка данных из main.js для синхронизации с аудио
 
 let audioData = null;
+let params = null;
 
 self.onmessage = function(e) {
-    if (e.data.type === 'initAudioWorker') {
-        // Инициализация audioWorker
-        audioWorker = new Worker('js/audioWorker.js');
-        audioWorker.postMessage(e.data.audioData);
-        audioWorker.onmessage = function(event) {
-            // Получаем данные анализа аудио
-            audioData = event.data;
-            // Обновляем параметры фрактала на основе аудио
-            const updatedParams = {
-                ...e.data.params,
-                maxIterations: Math.floor(audioData.bass * 2),
-                zoom: 1 + (audioData.mid / 100)
-            };
-            const fractalData = generateFractal(updatedParams);
-            self.postMessage({
-                type: 'fractalRenderedWithAudio',
-                data: fractalData,
-                audioData: audioData
-            });
+    if (e.data.type === 'params') {
+        params = e.data.params;
+    } else if (e.data.type === 'audioUpdate') {
+        // Обновляем параметры фрактала на основе данных аудио
+        audioData = e.data.data;
+        const updatedParams = {
+            ...params,
+            maxIterations: Math.floor(audioData.bass * 2 + 50), // Бас влияет на количество итераций
+            zoom: 1 + (audioData.mid / 100) // Мид изменяет масштаб
         };
+        const fractalData = generateFractal(updatedParams);
+        self.postMessage({
+            type: 'fractalRenderedWithAudio',
+            data: fractalData,
+            audioData: audioData
+        });
     } else {
         // Обычная генерация фрактала
-        const fractalData = generateFractal(e.data.params);
+        const fractalData = generateFractal(params);
         self.postMessage(fractalData);
     }
 };
@@ -54,8 +49,8 @@ function generateFractal(params) {
                 iter++;
             }
             
-            // Цвет в зависимости от количества итераций
-            const colourIndex = iter % 256;
+            // Цвет в зависимости от количества итераций и данных аудио
+            const colourIndex = iter % 256 + Math.floor(audioData?.treble || 0);
             imageData[(y * width + x) * 4 + 0] = colourIndex; // R
             imageData[(y * width + x) * 4 + 1] = colourIndex; // G
             imageData[(y * width + x) * 4 + 2] = colourIndex; // B

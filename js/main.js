@@ -16,22 +16,28 @@ if (loadingCircle) {
   animateLoadingCircle(loadingCircle);
 }
 
-
 // Объекты для хранения сцен
 let currentScene = null;
 let currentRenderer = null;
 let fractalWorker = null;
 
+// Канал связи с audioWorker
+let audioWorker = null;
+let audioContext = null;
+let analyser = null;
+let audioSource = null;
+let audioDataBuffer = null;
+
 // Флаг активного режима
 let is3DMode = false;
 
-// ===== ОБРАБОТКА ОШИБОК ====
+// ===== ОБРАБОТКА ОШИБОК =====
 const handleError = (error) => {
     console.error("Ошибка в приложении:", error);
     alert("Произошла ошибка. Проверьте совместимость браузера или обновите страницу.");
 };
 
-// ===== ПЕРЕКЛЮЧЕНИЕ РЕЖИМОВ ====
+// ===== ПЕРЕКЛЮЧЕНИЕ РЕЖИМОВ =====
 const toggle3DMode = () => {
     try {
         if (is3DMode) {
@@ -41,8 +47,6 @@ const toggle3DMode = () => {
             document.getElementById('app').innerHTML = '';
             const mountPoint = document.getElementById('app');
             mountPoint.appendChild(canvas);
-            
-            // Перезапуск 2D фрактала
             initFractal();
         } else {
             // Переход в 3D режим
@@ -78,7 +82,7 @@ const toggle3DMode = () => {
     }
 };
 
-// ===== ИНИЦИАЛИЗАЦИЯ ФРАКТАЛА ====
+// ===== ИНИЦИАЛИЗАЦИЯ ФРАКТАЛА =====
 const initFractal = () => {
     showLoading();
     const canvas = document.getElementById('fractalCanvas');
@@ -114,29 +118,54 @@ const initFractal = () => {
     // Отправляем параметры в Worker
     fractalWorker.postMessage({ params });
     
-    // Инициализация обработки аудио
-    fractalWorker.postMessage({
-        type: 'initAudioWorker',
-        audioData: {
-            bass: 0,
-            mid: 0,
-            treble: 0
-        },
-        params
-    });
-    
-    // Функция для инициализации режима "Кинетическая живопись"
-    const initPaintingMode = ({ canvas }) => {
-        const fractal = new Fractal(canvas);
-        const paintingMode = new PaintingModeSync(fractal);
-        return paintingMode;
-    };
-    
     // Инициализация режима "Кинетическая живопись"
     const paintingModeInstance = initPaintingMode({ canvas });
     
     // Скрыть состояние загрузки
     hideLoading();
+
+    // Отправляем событие о завершении загрузки
+    window.dispatchEvent(new CustomEvent('fractalLoaded', { detail: { success: true } }));
+
+    // Анимация появления canvas с задержкой
+    const fractalCanvas = document.getElementById('fractalCanvas');
+    fractalCanvas.classList.add('loaded');
+    setTimeout(() => {
+        fractalCanvas.style.opacity = '1';
+        fractalCanvas.style.transform = 'scale(1)';
+        fractalCanvas.style.filter = 'blur(0)';
+    }, 200);
+
+    // Показываем сообщение об успешной загрузке
+    const successMessage = document.createElement('div');
+    successMessage.className = 'success-message';
+    successMessage.textContent = 'Готово! Начните рисовать фракталы!';
+    successMessage.id = 'successMessage';
+    document.body.appendChild(successMessage);
+    setTimeout(() => {
+        successMessage.classList.add('show');
+        setTimeout(() => {
+            successMessage.classList.remove('show');
+        }, 3000);
+    }, 800);
+
+    // Обработчик скролла для анимации при достижении низа страницы
+    const scrollTrigger = document.getElementById('scroll-trigger');
+    const scrollEffect = document.createElement('div');
+    scrollEffect.className = 'scroll-effect';
+    document.body.appendChild(scrollEffect);
+    
+    window.addEventListener('scroll', () => {
+        const scrollPosition = window.scrollY + 100;
+        const viewportHeight = window.innerHeight;
+        const scrollTriggerPosition = scrollTrigger.getBoundingClientRect().top + scrollPosition;
+        
+        if (scrollTriggerPosition <= scrollPosition + viewportHeight / 2) {
+            scrollEffect.classList.add('active');
+        } else {
+            scrollEffect.classList.remove('active');
+        }
+    });
     
     // Обработчик для кнопки "Кинетическая живопись"
     const paintingModeBtn = document.getElementById('paintingModeBtn');
@@ -194,6 +223,43 @@ const updateAudioVisualFeedback = (audioData) => {
     }, 500);
 };
 
+// Инициализация режима "Кинетическая живопись"
+const initPaintingMode = ({ canvas }) => {
+    const fractal = new Fractal(canvas);
+    return new PaintingModeSync(fractal);
+};
+
+// Инициализация audioWorker
+function initAudioWorker() {
+    audioWorker = new Worker('./js/audioWorker.js');
+    audioWorker.onmessage = function(e) {
+        if (e.data.type === 'audioAnalysisResult') {
+            // Передаём данные анализа в fractalWorker
+            if (fractalWorker) {
+                fractalWorker.postMessage({
+                    type: 'audioUpdate',
+                    data: e.data.data
+                });
+            }
+        }
+    };
+    audioWorker.postMessage({ type: 'initAudioContext' });
+}
+
+// Показать состояние загрузки
+const showLoading = () => {
+    const loadingElement = document.getElementById('loading');
+    loadingElement.classList.remove('hidden');
+    console.log('Loading shown');
+};
+
+// Скрыть состояние загрузки
+const hideLoading = () => {
+    const loadingElement = document.getElementById('loading');
+    loadingElement.classList.add('hidden');
+    console.log('Loading hidden');
+};
+
 // Проверка на отключение анимаций
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -202,28 +268,7 @@ if (prefersReducedMotion) {
     document.body.classList.add('no-animations');
 }
 
-// Отладочная функция для проверки состояния загрузки
-const debugLoadingState = () => {
-    const loadingElement = document.getElementById('loading');
-    console.log('Loading state:', loadingElement.classList.contains('hidden') ? 'hidden' : 'visible');
-    console.log('Loading opacity:', window.getComputedStyle(loadingElement).opacity);
-};
-
-// Показать состояние загрузки
-const showLoading = () => {
-    const loadingElement = document.getElementById('loading');
-    loadingElement.classList.remove('hidden');
-    console.log('Loading shown');
-    debugLoadingState();
-};
-
-// Скрыть состояние загрузки
-const hideLoading = () => {
-    const loadingElement = document.getElementById('loading');
-    loadingElement.classList.add('hidden');
-    console.log('Loading hidden');
-    debugLoadingState();
-};
-
-// Запуск инициализации
-initFractal();
+window.onload = function() {
+    initFractal();
+    initAudioWorker();
+}

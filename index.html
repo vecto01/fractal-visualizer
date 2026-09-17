@@ -167,18 +167,56 @@
                     setTimeout(() => {
                         finalAnimation.style.display = 'none';
                         document.getElementById('successMessage').style.display = 'block';
-                        document.getElementById('successMessage').classList.add('success-animation');
+                        document.getElementById('successMessage').classList.add('success-message-animation');
                     }, 500);
                 }, 1000);
             });
         });
+        
+        // Логика переключения кнопок и индикатора
+        const toggle3DModeBtn = document.getElementById('toggle3DModeBtn');
+        const paintingModeBtn = document.getElementById('paintingModeBtn');
+        const indicator = document.getElementById('indicator');
+        
+        // Начальное состояние кнопок
+        toggle3DModeBtn.classList.remove('fade-in');
+        paintingModeBtn.classList.remove('fade-in');
+        
+        // Начальное положение индикатора
+        indicator.style.transform = 'translateY(0)';
+        
+        // Переключение режимов
+        toggle3DModeBtn.addEventListener('click', function() {
+            this.classList.toggle('active');
+            paintingModeBtn.classList.remove('active');
+            indicator.style.transform = 'translateY(30px)';
+        });
+        
+        paintingModeBtn.addEventListener('click', function() {
+            this.classList.toggle('active');
+            toggle3DModeBtn.classList.remove('active');
+            indicator.style.transform = 'translateY(0)';
+        });
     </script>
     <body>
-    <div id="loading"></div>
+    <div id="loading-spinner" class="loading-spinner"></div>
+        <div id="loading-message" class="loading-message">Загрузка...</div>
+        <div id="finalAnimation" class="final-animation"></div>
+        <div id="successMessage" class="success-message">Готово!</div>
+        <div id="loading"></div>
     <div id="app"></div>
-    <button id="toggle3DModeBtn">Переключить на 3D</button>
-    <button id="paintingModeBtn">Кинетическая живопись</button>
-    <div id="audioIndicator" class="audio-indicator">AUDIO: 0</div>
+    <div class="container">
+        <div id="successMessage" class="success-message">Готово!</div>
+        <button id="toggle3DModeBtn" class="button">Переключить на 3D</button>
+        <div class="indicator" id="indicator"></div>
+        <button id="paintingModeBtn" class="button active">Кинетическая живопись</button>
+        <div id="audioIndicator" class="audio-indicator">AUDIO: 0</div>
+    </div>
+    <div class="fixed-buttons">
+        <button id="toggle3DModeBtn" class="button">Переключить на 3D</button>
+        <div class="indicator" id="indicator"></div>
+        <button id="paintingModeBtn" class="button active">Кинетическая живопись</button>
+    </div>
 <script src="js/animations.js"></script>
 <script src="js/main.js"></script>
 <script>
@@ -187,5 +225,11 @@
         if (prefersReducedMotion) {
             document.body.classList.add('no-animations');
         }
+<footer class="footer">
+    <p>© 2023 Fractal Visualizer. Все права защищены.
+       <a href="https://github.com/vecto01/fractal-visualizer" target="_blank" rel="noopener noreferrer">GitHub</a></p>
+</footer>
+<div id="scroll-trigger"></div>
     </script>
+</body>
 </body>

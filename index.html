@@ -4,685 +4,402 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fractal Visualizer</title>
-:root {
-    --primary-color: #2d3748;
-    --secondary-color: #4a5568;
-    --accent-color: #38bdf8; /* Увеличена насыщенность */
-    --text-color: #1a1a1a; /* Лучшая читаемость */
-    --border-radius: 8px;
---transition-speed: 0.4s;
-}
-}
---palette-gradient: linear-gradient(135deg, #38bdf8, #93c5fd);
-@media (prefers-reduced-motion: reduce) {
-    * {
-        transition: none !important;
-        animation: none !important;
-    }
-    button {
-        transform: none !important;
-    }
-}
-
-body {
-    margin: 0;
-    padding: 0;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: var(--primary-color);
-    color: var(--text-color);
-    transition: background-color var(--transition-speed) ease;
-}
-
-.container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
-    text-align: center;
-}
-
-.fractal-container {
-    width: 100%;
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 20px;
-}
-canvas {
-    background-color: var(--primary-color);
-gap: 12px;
-    display: block;
-    margin: 0 auto;
-    width: 100%;
-    max-width: 90%;
-    height: auto;
-    min-height: var(--canvas-min-height);
-    opacity: 0;
-    transition: opacity var(--transition-speed) ease, transform var(--transition-speed) ease;
-    transform: scale(0.95);
-    box-sizing: border-box;
-transition: opacity var(--transition-speed) ease-in-out, transform var(--transition-speed) ease-in-out;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    opacity: 0.95;
-}
-}
-
-.controls {
-    background-color: rgba(45, 55, 72, 0.9);
-    padding: 15px;
-    border-radius: var(--border-radius);
-    width: 90%;
-    max-width: 500px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-    overflow-y: auto;
-    max-height: 80vh;
-}
-
-.control-row {
-    margin-bottom: 12px;
-}
-    display: flex;
-.control-row {
-    margin-bottom: 12px;
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 12px;
-}
-}
-
-label {
-    display: block;
-    margin-bottom: 5px;
-    font-size: 14px;
-    color: var(--text-color);
-}
-
-input, select, button {
-    width: 100%;
-    padding: 8px;
-    margin-bottom: 10px;
-    border: 1px solid #4a5568;
-
-input[type="range"] {
-    width: 100%;
-    height: 30px;
-    margin: 8px 0;
-    transition: all var(--transition-speed) ease;
-    background: var(--secondary-color);
-    border-radius: var(--border-radius);
-    outline: none;
-}
-
-input[type="range"]::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 16px;
-    height: 16px;
-    background-color: var(--accent-color);
-    border-radius: 50%;
-    box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);
-    transition: transform var(--transition-speed) ease;
-    cursor: pointer;
-}
-
-input[type="range"]::-moz-range-thumb {
-    width: 16px;
-    height: 16px;
-    background-color: var(--accent-color);
-    border-radius: 50%;
-    cursor: pointer;
-}
-
-input[type="range"]::-webkit-slider-runnable-track {
-    height: 4px;
-    background: var(--secondary-color);
-    border-radius: var(--border-radius);
-    transition: background-color var(--transition-speed) ease;
-}
-    appearance: none;
-button {
-    background-color: var(--palette-gradient);
-    border: none;
-    cursor: pointer;
-    font-weight: bold;
-    font-size: 15px;
-    color: white;
-    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
-    transition: all var(--transition-speed) ease;
-button:hover {
-    transform: scale(1.02);
-    transition: transform var(--transition-speed) ease;
-}
-    cursor: pointer;
-    transition: transform var(--transition-speed) ease;
-}
-
-input[type="range"]::-webkit-slider-runnable-track {
-    background: var(--secondary-color);
-    border-radius: var(--border-radius);
-    height: 4px;
-    transition: background-color var(--transition-speed) ease;
-}
-    transition: all var(--transition-speed) ease;
-    box-sizing: border-box;
-}
-
-input:focus, select:focus, button:focus {
-    border-color: var(--accent-color);
-button {
-    background-color: var(--palette-gradient);
-    border: none;
-    cursor: pointer;
-    font-weight: bold;
-    transition: all var(--transition-speed) ease;
-    will-change: transform;
-}
-
-button#paintingModeBtn {
-    background-color: #ff6b6b;
-    border: none;
-    cursor: pointer;
-    font-weight: bold;
-    transition: all var(--transition-speed) ease;
-    will-change: transform;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 10px;
-    width: 100%;
-    color: white;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-}
-
-.control-row {
-    margin-bottom: 12px;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    align-items: center;
-    width: 100%;
-}
-
-@media (min-width: 768px) {
-    .control-row {
-        flex-direction: row;
-        align-items: center;
-        justify-content: space-between;
-        width: 100%;
-        margin-bottom: 16px;
-    }
-}
-button#exportBtn {
-    background-color: var(--accent-color);
-    border: none;
-    cursor: pointer;
-    font-weight: bold;
-    transition: all var(--transition-speed) ease;
-    will-change: transform;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 10px;
-    width: 100%;
-    color: white;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-}
-
-button#exportBtn:hover {
-    background-color: #519fdf;
-    transform: translateY(-2px);
-}
-
-button#exportBtn:active {
-    transform: translateY(2px);
-}
-
-#export-complete {
-    color: #ffffff;
-    font-weight: bold;
-    transition: all var(--transition-speed) ease;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-}
-button:hover {
-    background-color: #519fdf;
-    transform: scale(var(--hover-scale));
-}
-
-button:active {
-    transform: scale(0.98);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-}
-
-button::after {
-    content: " ";
-    display: inline-block;
-    width: 0;
-    height: 0;
-    border-left: 5px solid transparent;
-    border-right: 5px solid transparent;
-    border-bottom: 5px solid var(--primary-color);
-    margin-left: 4px;
-    opacity: 0;
-    transition: opacity var(--transition-speed) ease;
-}
-
-button:hover::after {
-@media (max-width: 1200px) {
-    .control-row {
-        gap: 16px;
-    }
-}
-}
-
-.palette-selector {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 10px;
-    margin-bottom: 15px;
-}
-
-.palette-option {
-    width: 40px;
-    height: 40px;
-    background: var(--palette-gradient);
-    border-radius: var(--border-radius);
-    border: 2px solid var(--secondary-color);
-    cursor: pointer;
-    transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.palette-option:hover {
-    transform: scale(1.05);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-}
-
-.palette-option:last-child {
-    margin-bottom: 0;
-}
-
-.palette-option::after {
-    content: "";
-    position: absolute;
-    bottom: -1px;
-    left: 0;
-    right: 0;
-    height: 1px;
-    background-color: rgba(255, 255, 255, 0.2);
-    transform: scaleX(0);
-    transform-origin: bottom right;
-    transition: transform 0.2s ease;
-}
-
-.palette-option:not(:last-child):hover::after {
-    transform: scaleX(1);
-    transform-origin: bottom left;
-}
-    <script src="https://cdn.jsdelivr.net/npm/gif.js@0.2.0/dist/gif.js"></script>
     <style>
-        .export-btn {
+        :root {
+            --primary-color: #2d3748;
+            --secondary-color: #4a5568;
+            --accent-color: #38bdf8;
+            --text-color: #f5f7fa;
+            --border-radius: 8px;
+            --transition-speed: 0.4s;
+            --palette-gradient: linear-gradient(135deg, #38bdf8, #93c5fd);
+        }
+
+        [data-theme="light"] {
+            --primary-color: #f0f2f5;
+            --secondary-color: #d5dae1;
+            --text-color: #1a1a1a;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            * { transition: none !important; animation: none !important; }
+        }
+
+        * { box-sizing: border-box; }
+        [hidden] { display: none !important; }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--primary-color);
+            color: var(--text-color);
+            transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: center;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        h1 {
+            margin: 0 0 4px;
+            font-size: 2.5rem;
+            font-weight: 600;
+        }
+
+        #themeToggle {
+            padding: 8px 14px;
+            border-radius: var(--border-radius);
+            border: 1px solid var(--secondary-color);
+            background: var(--secondary-color);
+            color: var(--text-color);
+            cursor: pointer;
+            font-weight: 600;
+            transition: transform var(--transition-speed) ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        #themeToggle:hover { transform: scale(1.05); }
+        #themeToggle.active { background: var(--accent-color); color: #000; }
+
+        .fractal-container {
+            width: 100%;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            padding: 30px 0 50px;
+        }
+
+        #loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            padding: 40px 0;
+            opacity: 1;
+            transition: opacity 0.4s ease;
+            background-color: rgba(45, 55, 72, 0.95);
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid var(--secondary-color);
+            border-top-color: var(--accent-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 15px;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        canvas {
+            display: block;
+            margin: 0 auto;
+            width: 100%;
+            max-width: 640px;
+            aspect-ratio: 1 / 1;
+            height: auto;
+            background-color: #000;
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+            opacity: 0;
+            transform: scale(0.95);
+            transition: opacity var(--transition-speed) ease, transform var(--transition-speed) ease;
+            cursor: crosshair;
+            filter: blur(2px);
+        }
+        canvas.loaded {
+            opacity: 1;
+            transform: scale(1);
+            filter: blur(0);
+        }
+        canvas.painting-mode {
+            outline: 2px solid var(--accent-color);
+            transition: outline 0.3s ease;
+        }
+        canvas:hover {
+            filter: brightness(1.05);
+        }
+
+        .controls {
+            background-color: rgba(45, 55, 72, 0.95);
+            padding: 20px;
+            border-radius: var(--border-radius);
+            width: 90%;
+            max-width: 520px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            margin-bottom: 30px;
+            border: 1px solid var(--secondary-color);
+        }
+
+        [data-theme="light"] .controls { background-color: rgba(255, 255, 255, 0.85); }
+
+        .control-row {
+            margin-bottom: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            align-items: stretch;
+            text-align: left;
+        }
+
+        label {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-color);
+        }
+
+        input, select, button {
+            font-family: inherit;
+            font-size: 14px;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 28px;
+            background: transparent;
+            cursor: pointer;
+        }
+        input[type="range"]::-webkit-slider-runnable-track {
+            height: 6px;
+            background: var(--secondary-color);
+            border-radius: var(--border-radius);
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            margin-top: -7px;
+            width: 20px;
+            height: 20px;
+            background-color: var(--accent-color);
+            border-radius: 50%;
+            box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
+            transition: transform var(--transition-speed) ease;
+            cursor: pointer;
+        }
+        input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.2); }
+        input[type="range"]::-moz-range-track {
+            height: 6px;
+            background: var(--secondary-color);
+            border-radius: var(--border-radius);
+        }
+        input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
             background-color: var(--accent-color);
             border: none;
+            border-radius: 50%;
             cursor: pointer;
+        }
+
+        select {
+            background-color: rgba(20, 25, 35, 0.9);
+            color: var(--text-color);
+            padding: 8px;
+            border-radius: var(--border-radius);
+            border: 1px solid var(--secondary-color);
+            transition: border-color var(--transition-speed) ease;
+        }
+        select:hover { border-color: var(--accent-color); }
+
+        .palette-selector {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .palette-option {
+            width: 36px;
+            height: 36px;
+            border-radius: var(--border-radius);
+            border: 2px solid var(--secondary-color);
+            cursor: pointer;
+            transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+        }
+        .palette-option:hover { transform: scale(1.1); }
+        .palette-option.active { border-color: var(--accent-color); box-shadow: 0 0 0 2px var(--accent-color); }
+
+        button {
+            background: var(--palette-gradient);
+            border: none;
+            border-radius: var(--border-radius);
+            color: #ffffff;
             font-weight: bold;
+            text-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
+            padding: 12px;
+            cursor: pointer;
             transition: all var(--transition-speed) ease;
-            will-change: transform;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
+            width: 100%;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
-        
-        .export-btn:hover {
-            background-color: #519fdf;
+        button:hover {
             transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
         }
-/* Анимация загрузки */
-@keyframes loadingGradient {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-}
+        button:active {
+            transform: translateY(0);
+        }
 
-.loading-spinner {
-    position: fixed;
-.fractal-container {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 20px;
-    max-height: calc(100vh - 40px);
-    overflow-y: auto;
-    padding: 10px;
-    box-sizing: border-box;
-}
+        button#paintingModeBtn {
+            background: linear-gradient(135deg, #ff6b6b, #ff8e8e);
+        }
+        button#paintingModeBtn.active {
+            outline: 2px solid #ffffff;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
 
-.controls {
-    background-color: rgba(45, 55, 72, 0.9);
-    padding: 15px;
-    border-radius: var(--border-radius);
-    width: 90%;
-    max-width: 500px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-    overflow-y: auto;
-    max-height: 80vh;
-    margin-bottom: 20px;
-}
-/* Адаптивность и контраст */
-body {
-    margin: 0;
-    padding: 0;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: var(--primary-color);
-    color: var(--text-color);
-    transition: background-color var(--transition-speed) ease;
-    min-height: 100vh;
-}
+        button#paintingModeBtn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
 
-.container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
-    text-align: center;
-    min-height: 100vh;
-}
+        button#exportBtn {
+            background: linear-gradient(to right, #007bff, #0056b3);
+            font-weight: bold;
+            text-shadow: none;
+        }
+        button#exportBtn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+        }
 
-.fractal-container {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 20px;
-    max-height: calc(100vh - 40px);
-    overflow-y: auto;
-}
+        .export-complete {
+            color: var(--accent-color);
+            font-weight: bold;
+            text-align: center;
+            opacity: 0;
+            animation: fadeIn 0.5s ease forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
 
-/* Контраст и шрифты */
-label, button, input, select {
-    color: var(--text-color);
-    font-size: 14px;
-    font-weight: 500;
-}
+        footer {
+            margin-top: 20px;
+            font-size: 12px;
+            opacity: 0.6;
+            color: var(--text-color);
+            text-align: center;
+        }
 
-select {
-    background-color: rgba(45, 55, 72, 0.95);
-    color: var(--text-color);
-    padding: 8px;
-    border-radius: var(--border-radius);
-    border: 1px solid #4a5568;
-}
-
-/* Анимации */
-.palette-option {
-    transition: transform 0.5s ease-in-out;
-    transform: scale(1);
-}
-
-.palette-option:hover {
-    transform: scale(1.05);
-}
-
-button {
-    transition: all 0.5s ease-in-out;
-.control-row {
-    margin-bottom: 15px;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    align-items: center;
-}
-
-.palette-selector {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 10px;
-    margin-bottom: 15px;
-    min-width: 150px;
-}
-
-.palette-option {
-    transition: transform 0.5s ease-in-out;
-    transform: scale(1);
-    padding: 8px;
-@media (max-width: 1024px) {
-    button#paintingModeBtn {
-        font-size: 14px;
-        padding: 6px 12px;
-    }
-    .palette-option {
-        min-width: 30px;
-        font-size: 12px;
-    }
-}
-    justify-content: center;
-    gap: 8px;
-    padding: 10px;
-    width: 100%;
-    margin-bottom: 10px;
-    position: relative;
-}
-
-.export-btn::after {
-    content: "📥";
-    font-size: 16px;
-    opacity: 0;
-    transition: opacity var(--transition-speed) ease;
-}
-
-.export-btn:hover::after {
-    opacity: 1;
-}
-    width: 100%;
-    margin-bottom: 10px;
-}
-
-.export-btn:hover {
-    background-color: #519fdf;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
-
-.format-hint {
-    font-size: 0.8em;
-    opacity: 0.7;
-    color: var(--text-color);
-    text-align: center;
-    width: 100%;
-    margin-bottom: 10px;
-}
-
-/* Адаптивность */
-@media (max-width: 1200px) {
-    .controls button, .controls input, .controls select {
-        padding: 10px 12px;
-        font-size: 14px;
-    }
-    .control-row label {
-        font-size: 15px;
-    }
-    input[type="range"] {
-        width: 100%;
-        margin: 10px 0;
-    }
-    .palette-option {
-        min-width: 60px;
-    }
-    .controls button {
-        margin-right: 10px;
-    }
-    .controls button:last-child {
-        margin-right: 0;
-    }
-}
-
-@media (max-width: 1024px) {
-    .controls {
-        width: 95%;
-        padding: 12px;
-    }
-    button {
-        padding: 8px;
-    }
-    .palette-option {
-        min-width: 50px;
-    }
-    .fractal-container {
-        padding-bottom: 20px;
-    }
-}
-
-@media (max-width: 768px) {
-    .controls {
-        width: 98%;
-        padding: 10px;
-    }
-    button {
-        padding: 6px;
-    }
-    .palette-option {
-        min-width: 40px;
-        font-size: 12px;
-    }
-    .controls button {
-        margin-right: 8px;
-    }
-    .controls button:last-child {
-        margin-right: 0;
-    }
-    .fractal-container {
-        max-height: calc(100vh - 80px);
-    }
-}
-
-@media (max-width: 480px) {
-    .controls {
-        padding: 8px;
-    }
-    button {
-        padding: 4px;
-    }
-    .palette-option {
-        min-width: 30px;
-        font-size: 10px;
-    }
-    .fractal-container {
-        max-height: calc(100vh - 60px);
-    }
-}
-        min-width: 50px;
-        font-size: 12px;
-    }
-    .controls button {
-        margin-right: 8px;
-    }
-    .controls button:last-child {
-        margin-right: 0;
-    }
-}
-
-@media (max-width: 480px) {
-    .controls {
-        padding: 8px;
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const canvas = document.querySelector('canvas');
-        const fractalContainer = document.querySelector('.fractal-container');
-        // Плавное появление канваса
-        setTimeout(() => {
-            const canvas = document.getElementById('fractalCanvas');
-            if (canvas) {
-                canvas.classList.add('loaded');
+        @media (max-width: 768px) {
+            .controls {
+                width: 96%;
+                padding: 16px;
             }
-            canvas.style.opacity = '1';
-            canvas.style.transform = 'scale(1)';
-            fractalContainer.style.opacity = '1';
-        }, 300);
-            canvas.style.transform = 'scale(0.95)';
-            canvas.style.opacity = '0.7';
-            setTimeout(() => {
-                canvas.style.transform = 'scale(1)';
-                canvas.style.opacity = '1';
-            }, 300);
+            canvas {
+                max-width: 90%;
+            }
+            .palette-option {
+                width: 30px;
+                height: 30px;
+            }
+            h1 {
+                font-size: 2rem;
+            }
+            .control-row {
+                margin-bottom: 10px;
+            }
         }
 
-        // Привязка к кнопке обновления
-        document.querySelector('.update-fractal-btn').addEventListener('click', animateUpdate);
-    });
-</script>
-    button {
-        padding: 4px;
-    }
-    .palette-option {
-        min-width: 40px;
-        font-size: 10px;
-    }
-    .fractal-container {
-        max-height: calc(100vh - 100px);
-        overflow-y: auto;
-    }
-}
-        font-size: 12px;
-    }
-}
+        @media (max-width: 480px) {
+            .palette-option {
+                width: 26px;
+                height: 26px;
+            }
+            footer {
+                font-size: 11px;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Fractal Visualizer</h1>
+        <header>
+            <h1>Fractal Visualizer</h1>
+            <button id="themeToggle" type="button">🌙 Тёмная тема</button>
+        </header>
+
         <div class="fractal-container">
-            <canvas id="fractalCanvas"></canvas>
+            <div id="loading">
+                <div class="loading-spinner"></div>
+                <p>Загрузка фрактала...</p>
+            </div>
+
+            <canvas id="fractalCanvas" width="640" height="640" hidden></canvas>
+
             <div class="controls">
                 <div class="control-row">
-                    <label for="fractalType">Тип фрактала:</label>
+                    <label for="fractalType">Тип фрактала</label>
                     <select id="fractalType">
                         <option value="mandelbrot">Мандельброта</option>
                         <option value="julia">Джулия</option>
                     </select>
                 </div>
+
                 <div class="control-row">
-                    <label for="palette">Цветовая палитра:</label>
-                    <div class="palette-selector" id="paletteSelector">
-                        <!-- Палитры будут добавлены JavaScript -->
-                    </div>
-                </div>
-                <div class="control-row">
-                    <label for="iterations">Итерации:</label>
-                    <input type="range" id="iterations" min="1" max="100" value="50">
-                    <span id="iterationsValue">50</span>
-                </div>
-                <div class="control-row">
-                    <label for="zoom">Зум:</label>
-                    <input type="range" id="zoom" min="0.1" max="2" step="0.1" value="1" oninput="updateZoom()">
-                </div>
-                <div class="control-row">
-                <div class="control-row">
-                    <button id="paintingModeBtn">Кинетическая живопись</button>
-                </div>
-                <div class="control-row">
-                    <p id="export-complete" class="export-complete">Экспорт завершён!</p>
+                    <label>Цветовая палитра</label>
+                    <div class="palette-selector" id="paletteSelector"></div>
                 </div>
 
-                    <label for="exportFormat">Формат экспорта:</label>
+                <div class="control-row">
+                    <label for="iterations">Итерации: <span id="iterationsValue">60</span></label>
+                    <input type="range" id="iterations" min="10" max="200" value="60">
+                </div>
+
+                <div class="control-row">
+                    <label for="zoom">Зум: <span id="zoomValue">1.0</span></label>
+                    <input type="range" id="zoom" min="0.1" max="4" step="0.1" value="1">
+                </div>
+
+                <div class="control-row">
+                    <button id="paintingModeBtn" type="button">🎨 Кинетическая живопись</button>
+                </div>
+
+                <div class="control-row">
+                    <label for="exportFormat">Формат экспорта</label>
                     <select id="exportFormat">
                         <option value="png">PNG</option>
                         <option value="svg">SVG</option>
                     </select>
                 </div>
                 <div class="control-row">
-                    <button id="exportBtn">Экспортировать</button>
+                    <button id="exportBtn" type="button">📥 Экспортировать</button>
+                    <p id="export-complete" class="export-complete" hidden>Экспорт завершён!</p>
                 </div>
+            </div>
         </div>
+
+        <footer>Клик по канвасу в режиме «Кинетическая живопись» смещает центр фрактала.</footer>
     </div>
     <script src="scripts/fractal.js"></script>
 </body>

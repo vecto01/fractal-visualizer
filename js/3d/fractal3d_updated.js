@@ -1,3 +1,53 @@
+// ===== ФУНКЦИЯ ДЛЯ ГЕНЕРАЦИИ ФРАКТАЛА (МНОЖЕСТВО МАНДЕЛЬБРОТА) =====
+const generateMandelbrotFractal = (count, depth) => {
+    const vertices = [];
+    const colors = [];
+    
+    for (let i = 0; i < count; i++) {
+        // Генерация координат в плоскости комплексных чисел
+        const x = Math.random() * 3.5 - 2.5; // Ось Re
+        const y = Math.random() * 2 - 1;    // Ось Im
+        
+        // Рекурсивное вычисление фрактала
+        let zx = 0, zy = 0;
+        let iter = 0;
+        let escaped = false;
+        
+        for (let iter = 0; iter < depth; iter++) {
+            const xx = zx * zx - zy * zy + x;
+            const yy = 2 * zx * zy + y;
+            zx = xx;
+            zy = yy;
+            
+            if (zx * zx + zy * zy > 4) {
+                escaped = true;
+                break;
+            }
+        }
+        
+        // Если точка принадлежит множеству Мандельброта, сохраняем её
+        if (!escaped) {
+            // Преобразование в 3D-пространство
+            const z = iter / depth * 2 - 1; // Глубина по оси Z
+            vertices.push(x, y, z);
+            
+            // Цвет зависит от глубины рекурсии
+            const hue = (iter / depth) * 360;
+            colors.push(hueToRgb(hue), hueToRgb(hue + 120), hueToRgb(hue + 240));
+        }
+    }
+    
+    return { vertices, colors };
+};
+
+// ===== ПОМОГАТЕЛЬНАЯ ФУНКЦИЯ ДЛЯ ПРЕОБРАЗОВАНИЯ HUE В RGB =====
+const hueToRgb = (h) => {
+    h = h % 360;
+    if (h < 120) return h / 120;
+    if (h < 240) return (240 - h) / 120;
+    return (h - 240) / 120;
+};
+
 // ===== ДОПОЛНИТЕЛЬНЫЙ ШЕЙДЕР ДЛЯ УЛУЧШЕННОЙ 3D-ВИЗУАЛИЗАЦИИ ====
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js';
 
@@ -82,13 +132,10 @@ const init3DScene = () => {
     // Создание геометрии фрактала
     fractalGeometry = new THREE.BufferGeometry();
     const vertices = [];
-    const colors = [];
-
-    // Генерация вершин и цветов (заглушка)
-    for (let i = 0; i < 1000; i++) {
-        vertices.push(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1);
-        colors.push(Math.random(), Math.random(), Math.random());
-    }
+    // Генерация фрактальных вершин и цветов
+    const fractalData = generateMandelbrotFractal(vertexCount, 50);
+    vertices = fractalData.vertices;
+    colors = fractalData.colors;
 
     fractalGeometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
     fractalGeometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
@@ -118,6 +165,9 @@ const init3DScene = () => {
         console.warn("Three.js Warning:", warning);
     };
 
+    // Колбэк завершения анимации
+    let onRenderCompleteCallback = null;
+    
     // Анимация с обновлением времени
     const animate = () => {
         const now = performance.now();
@@ -142,8 +192,17 @@ const init3DScene = () => {
         customMaterial.uniforms.uTime.value += 0.016;
         renderer.render(scene, camera);
     };
-
-    // Обновление количества вершин
+    
+    // Запуск анимации
+    animate();
+    
+    // Возвращаем объект с колбэком завершения
+    return {
+        animate,
+        setOnComplete: (callback) => {
+            onRenderCompleteCallback = callback;
+        }
+    };
     const updateVertexCount = (count) => {
         const vertices = [];
         const colors = [];
@@ -158,7 +217,7 @@ const init3DScene = () => {
     };
 
 
-    animate();
+
 
     // Обработка изменения размера окна
     window.addEventListener('resize', () => {

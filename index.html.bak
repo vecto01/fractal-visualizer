@@ -97,7 +97,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.95);
+            background-color: rgba(0, 0, 0, 0.8);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -109,84 +109,30 @@
         }
 
         #loading h1 {
-            color: var(--accent-color);
-            font-size: 2.2rem;
-            margin-bottom: 1rem;
-            text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
-            font-weight: bold;
-        }
-
-        #loading-message {
             color: var(--text-color);
-            font-size: 1.2rem;
-            margin-top: 1rem;
-            opacity: 0;
-            transition: opacity 0.5s ease;
-        }
-
-        #success-message {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: rgba(0, 0, 0, 0.85);
-            color: var(--accent-color);
-            padding: 20px;
-            border-radius: var(--border-radius);
-            text-align: center;
-            z-index: 1000;
-            opacity: 0;
-            transition: opacity 0.5s ease;
-            max-width: 400px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-        }
-
-        #success-message.hidden {
-            opacity: 0;
-        }
-
-        #success-message p {
-            margin-bottom: 15px;
-            font-size: 1.2rem;
-            font-weight: bold;
-        }
-
-        #success-message button {
-            background: var(--palette-gradient);
-            border: none;
-            border-radius: var(--border-radius);
-            color: #ffffff;
-            font-weight: bold;
-            padding: 12px;
-            cursor: pointer;
-            transition: all var(--transition-speed) ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        #success-message button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+            animation: fadeIn 1s ease-in-out;
         }
 
         #loading-icon {
-
-        }
-
-            width: 60px;
-            height: 60px;
-            border: 4px solid var(--accent-color);
+            width: 80px;
+            height: 80px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
             border-radius: 50%;
-            border-top-color: #fff;
-            animation: spin 1.5s linear infinite;
+            border-top-color: var(--accent-color);
+            animation: spin 1.5s ease-in-out infinite;
             margin-bottom: 1rem;
         }
 
         @keyframes spin {
             to { transform: rotate(360deg); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         canvas {
@@ -215,16 +161,6 @@
             filter: blur(0);
         }
         canvas.painting-mode {}
-        /* Превью фрактала для пустого состояния */
-        canvas.unloaded {
-            background: linear-gradient(135deg, #38bdf8, #93c5fd);
-            opacity: 0.3;
-            transition: opacity 0.8s ease-in-out;
-        }
-        canvas.loaded {
-            opacity: 1;
-            background: none;
-        }
         canvas:hover {
             filter: brightness(1.05);
         }
@@ -380,21 +316,6 @@
             transform: translateY(0);
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
-        button.loading {
-            background: rgba(255, 255, 255, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            color: #ffffff;
-            cursor: not-allowed;
-            pointer-events: none;
-            opacity: 0.7;
-            animation: pulse 1.5s infinite;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
 
         button#paintingModeBtn {
             background: linear-gradient(135deg, #ff6b6b, #ff8e8e);
@@ -414,137 +335,85 @@
             font-weight: bold;
             text-shadow: none;
         }
+
     </style>
-</head>
-<body>
-    <div class="container">
-        <header>
-            <h1>Fractal Visualizer</h1>
-            <button id="themeToggle" onclick="toggleTheme()">🌙</button>
-        </header>
-        <div class="fractal-container">
-            <canvas id="fractalCanvas"></canvas>
-            <div class="controls-panel">
-                <h2>Fractal Parameters</h2>
-                <div class="control-group">
-                    <label for="depth">Recursion Depth:</label>
-                    <input type="range" id="depth" min="10" max="100" value="50">
-                </div>
-                <div class="control-group">
-                    <label for="point-count">Point Count:</label>
-                    <input type="range" id="point-count" min="500" max="2000" value="1000">
-                </div>
-                <div class="control-group">
-                    <label for="animation-speed">Animation Speed:</label>
-                    <input type="range" id="animation-speed" min="0.1" max="2" step="0.1" value="1">
-                </div>
-                <div id="success-message" class="hidden">
-                    <p>✨ Visualization complete! Enjoy the fractal!</p>
-                    <button id="restart-btn" class="fade-in">Restart Visualization</button>
-                </div>
-                <button id="start-visualization-btn" class="fade-in" style="margin-bottom: 10px;">Start Visualization</button>
-                <button id="export-btn" class="fade-in">Export Animation</button>
-            </div>
-        </div>
+
+    <div class="controls" style="display: flex; flex-direction: column; gap: 10px;">
+        <button id="paintingModeBtn" class="painting-mode-btn" onclick="togglePaintingMode()">
+            Кинетическая живопись
+        </button>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/controls/OrbitControls.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/tone@14.7.73/dist/tone.min.js"></script>
-    <script>
-        let isPaintingModeActive = false;
-        const canvas = document.getElementById('fractalCanvas');
-        
-        function togglePaintingMode() {
-            const btn = document.getElementById('paintingModeBtn');
-            isPaintingModeActive = !isPaintingModeActive;
-            
-            if (isPaintingModeActive) {
-                btn.classList.add('active');
-                if (window.initPaintingMode && window.initPaintingMode.deactivate) {
-                    window.initPaintingMode.deactivate();
-                }
-                if (window.init3DRender && window.init3DRender.deactivate) {
-                    window.init3DRender.deactivate();
-                }
-                init3DRender({ canvas });
-                canvas.classList.add('painting-mode');
-            } else {
-                btn.classList.remove('active');
-                deactivatePaintingMode();
-                if (window.init3DRender && window.init3DRender.deactivate) {
-                    window.init3DRender.deactivate();
-                }
-                canvas.classList.remove('painting-mode');
-            }
-        }
-        
-        function deactivatePaintingMode() {
-            const paintingMode = window.initPaintingMode;
-            if (paintingMode && paintingMode.deactivate) {
-                paintingMode.deactivate();
-            }
-        }
-        
-        // Инициализация 3D-рендера при загрузке страницы
-        window.onload = function() {
-            if (canvas) {
-                init3DRender({ canvas });
-            }
-        };
-
-        // Экспорт анимации в формате GIF
-        document.getElementById('export-btn').addEventListener('click', function() {
-            const canvas = document.getElementById('fractalCanvas');
-            const gif = new GIF({
-                workers: 2,
-                quality: 10,
-                width: canvas.width,
-                height: canvas.height
-            });
-
-            gif.on('finished', function(blob) {
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'fractal-animation.gif';
-                a.click();
-                URL.revokeObjectURL(url);
-            });
-            
-            gif.on('progress', function(progress) {
-                console.log('Export progress:', progress);
-            });
-            
-            gif.addFrame(canvas, { delay: 100, copy: true });
-            gif.render();
-        }
-
-        // Логика для кнопки Start Visualization
-        const startButton = document.getElementById('start-visualization-btn');
-        const loadingScreen = document.getElementById('loading');
-        let isVisualizationRunning = false;
-
-        startButton.addEventListener('click', function() {
-            if (!canvas.classList.contains('painting-mode')) {
-                startButton.classList.add('loading');
-                loadingScreen.style.opacity = '1';
-                isVisualizationRunning = true;
-
-                // Запускаем визуализацию
-                init3DRender({ canvas });
-                canvas.classList.add('painting-mode');
-
-                // Скрываем индикатор после завершения визуализации
-                setTimeout(() => {
-                    startButton.classList.remove('loading');
-                    loadingScreen.style.opacity = '0';
-                    isVisualizationRunning = false;
-                }, 5000); // Замените на реальное время завершения визуализации
-            }
-        });
-
-
-    <script src="https://cdn.jsdelivr.net/npm/gif.js@0.2.0/dist/gif.js"></script>
-    </script>
+    <body>
+        <div class="container">
+            <header>
+                <h1>Fractal Visualizer</h1>
+                <button id="themeToggle" onclick="toggleTheme()">🌙</button>
+            </header>
+            <div class="fractal-container">
+                <canvas id="fractalCanvas"></canvas>
+                <div class="controls-panel">
+                    <h2>Fractal Parameters</h2>
+                    <div class="control-group">
+                        <label for="depth">Recursion Depth:</label>
+                        <input type="range" id="depth" min="10" max="100" value="50">
+                    </div>
+                    <div class="control-group">
+                        <label for="point-count">Point Count:</label>
+                        <input type="range" id="point-count" min="500" max="2000" value="1000">
+                    </div>
+                    <div class="control-group">
+                        <label for="animation-speed">Animation Speed:</label>
+                        <input type="range" id="animation-speed" min="0.1" max="2" step="0.1" value="1">
+                    </div>
+                    <button id="export-btn">Export Animation</button>
+                </div>
+            </div>
+        </div>
     </body>
 </html>
+
+<script>
+    let isPaintingModeActive = false;
+    const canvas = document.getElementById('fractalCanvas');
+    
+    function togglePaintingMode() {
+        const btn = document.getElementById('paintingModeBtn');
+        isPaintingModeActive = !isPaintingModeActive;
+        
+        if (isPaintingModeActive) {
+            btn.classList.add('active');
+            if (window.initPaintingMode && window.initPaintingMode.deactivate) {
+                window.initPaintingMode.deactivate();
+            }
+            if (window.init3DRender && window.init3DRender.deactivate) {
+                window.init3DRender.deactivate();
+            }
+            init3DRender({ canvas });
+            canvas.classList.add('painting-mode');
+        } else {
+            btn.classList.remove('active');
+            deactivatePaintingMode();
+            if (window.init3DRender && window.init3DRender.deactivate) {
+                window.init3DRender.deactivate();
+            }
+            canvas.classList.remove('painting-mode');
+        }
+    }
+    
+    function deactivatePaintingMode() {
+        const paintingMode = window.initPaintingMode;
+        if (paintingMode && paintingMode.deactivate) {
+            paintingMode.deactivate();
+        }
+    }
+    
+    // Инициализация 3D-рендера при загрузке страницы
+    window.onload = function() {
+        if (canvas) {
+            init3DRender({ canvas });
+        }
+    };
+</script>

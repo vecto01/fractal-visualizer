@@ -1,11 +1,18 @@
 {
   "name": "fractal-visualizer",
   "version": "1.0.0",
+<<<<<<< HEAD
   "description": "**Интерактивный генератор фракталов Мандельброта и Джулия с анимациями, пользовательскими палитрами и режимом \"Кинетическая живопись\".**",
   "main": "script.js",
   "scripts": {
     "test": "mocha --compilers js:babel-core/register mocha.conf.js",
     "test:watch": "mocha --watch --compilers js:babel-core/register mocha.conf.js"
+=======
+  "description": "",
+  "main": "script.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+>>>>>>> 0f94417c702024c8c962dd6f9ac41c1a75e899ef
   },
   "repository": {
     "type": "git",
@@ -14,6 +21,7 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
+<<<<<<< HEAD
   "type": "module",
   "devDependencies": {
     "@babel/preset-env": "^7.23.9",
@@ -26,10 +34,14 @@
     "lighthouse": "^13.4.1",
     "mocha": "^12.0.1"
   },
+=======
+  "type": "commonjs",
+>>>>>>> 0f94417c702024c8c962dd6f9ac41c1a75e899ef
   "bugs": {
     "url": "https://github.com/vecto01/fractal-visualizer/issues"
   },
   "homepage": "https://github.com/vecto01/fractal-visualizer#readme",
+<<<<<<< HEAD
   "directories": {
     "test": "tests"
   },
@@ -344,5 +356,9 @@
     "yargs-parser": "^21.1.1",
     "yocto-queue": "^0.1.0",
     "zod": "^3.25.76"
+=======
+  "devDependencies": {
+    "http-server": "^14.1.1"
+>>>>>>> 0f94417c702024c8c962dd6f9ac41c1a75e899ef
   }
 }

@@ -157,12 +157,17 @@ function render() {
         renderPending = false;
         hideLoading();
     });
+<<<<<<< HEAD
     
     // Оптимизация для плавных анимаций
     if (state.paintingMode && state.audioActive) {
         requestAnimationFrame(render);
     }
 }
+=======
+}
+
+>>>>>>> 0f94417c702024c8c962dd6f9ac41c1a75e899ef
 // ---------- Управление ----------
 function resizeCanvas() {
     const size = Math.round(Math.min(canvas.clientWidth || 640, 640));
@@ -265,6 +270,7 @@ function exportSVG() {
 }
 
 exportBtn.addEventListener('click', () => {
+<<<<<<< HEAD
     if (exportFormatSelect.value === 'gif') {
         exportGIF();
     } else if (exportFormatSelect.value === 'svg') {
@@ -272,6 +278,9 @@ exportBtn.addEventListener('click', () => {
     } else {
         exportPNG();
     }
+=======
+    if (exportFormatSelect.value === 'svg') exportSVG(); else exportPNG();
+>>>>>>> 0f94417c702024c8c962dd6f9ac41c1a75e899ef
     exportCompleteEl.hidden = false;
     exportCompleteEl.style.animation = 'none';
     void exportCompleteEl.offsetWidth;
@@ -281,6 +290,7 @@ exportBtn.addEventListener('click', () => {
 
 window.addEventListener('resize', resizeCanvas);
 
+<<<<<<< HEAD
 // ---------- Обновление параметров фрактала ----------
 window.updateFractal = (params) => {
     state.zoom = Math.max(0.1, Math.min(params.zoom, 200));
@@ -291,6 +301,8 @@ window.updateFractal = (params) => {
     render();
 };
 
+=======
+>>>>>>> 0f94417c702024c8c962dd6f9ac41c1a75e899ef
 // ---------- Инициализация ----------
 buildPaletteSelector();
 resizeCanvas();

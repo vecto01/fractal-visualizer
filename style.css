@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 :root {
     --bg-color: #121212;
     --text-color: #f0f2f5;
@@ -208,11 +209,34 @@ canvas:hover {
 }
 
 @keyframes pulse-btn {
+=======
+/* Стили для фрактала */
+
+#fractalCanvas {
+    background: #1a1a1a;
+    border-radius: 8px;
+    box-shadow: 0 0 20px rgba(0, 100, 255, 0.3);
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+
+#fractalCanvas:hover {
+    box-shadow: 0 0 30px rgba(0, 100, 255, 0.5);
+}
+
+#fractalCanvas.click-feedback {
+    border: 2px solid rgba(0, 100, 255, 0.7);
+    animation: pulse 0.5s ease-out;
+}
+
+@keyframes pulse {
+>>>>>>> 0f94417c702024c8c962dd6f9ac41c1a75e899ef
     0% { transform: scale(1); }
     50% { transform: scale(1.05); }
     100% { transform: scale(1); }
 }
 
+<<<<<<< HEAD
 /* Анимация для индикатора загрузки */
 #loading {
     display: flex;
@@ -306,6 +330,49 @@ canvas:hover {
     animation: fadeOut 0.5s ease-out forwards;
 }
     animation: none;
+=======
+.wave-animation {
+    animation: wave 1.5s ease-out;
+}
+
+@keyframes wave {
+    0% { opacity: 0.8; }
+    100% { opacity: 1; }
+}
+
+/* Микровзаимодействия для кнопок */
+.painting-mode-btn {
+    background-color: #4a4a4a;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-weight: 500;
+}
+
+.painting-mode-btn:hover {
+    background-color: #5a5a5a;
+    transform: translateY(-2px);
+}
+
+.painting-mode-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.painting-mode-btn.active {
+    background-color: #00a0ff;
+    color: #1a1a1a;
+    animation: pulse-btn 0.5s ease-out;
+}
+
+@keyframes pulse-btn {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.08); }
+    100% { transform: scale(1); }
+>>>>>>> 0f94417c702024c8c962dd6f9ac41c1a75e899ef
 }
 
 /* Сообщение о загрузке */
@@ -319,6 +386,7 @@ canvas:hover {
 
 #loadingMessage.visible {
     display: block;
+<<<<<<< HEAD
 }
 
 /* Анимация для сообщения "Готово!" */
@@ -553,4 +621,6 @@ canvas:hover {
 button:focus {
     outline: 2px solid var(--accent-color);
     outline-offset: 2px;
+=======
+>>>>>>> 0f94417c702024c8c962dd6f9ac41c1a75e899ef
 }

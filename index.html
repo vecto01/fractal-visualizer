@@ -1,11 +1,4 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Fractal Visualizer</title>
-    <link rel="stylesheet" href="css/styles.css">
-    <style>
+<style>
         :root {
             --primary-color: #2d3748;
             --secondary-color: #4a5568;
@@ -16,75 +9,17 @@
             --palette-gradient: linear-gradient(135deg, #38bdf8, #93c5fd);
         }
 
-        /* Анимация загрузки */
-        .loading-spinner {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 50px;
-            height: 50px;
-            border: 3px solid rgba(0, 0, 0, 0.1);
-            border-radius: 50%;
-            border-top-color: var(--accent-color);
-            animation: spin 1s ease-in-out infinite;
-            z-index: 1000;
+        [data-theme="light"] {
+            --primary-color: #f0f2f5;
+            --secondary-color: #d5dae1;
+            --text-color: #1a1a1a;
         }
 
-        /* Анимация завершения загрузки */
-        .final-animation {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 100px;
-            height: 100px;
-            background-color: var(--accent-color);
-            border-radius: 50%;
-            opacity: 0;
-            transition: opacity 0.5s ease-in-out;
-            z-index: 1000;
-        }
-        
-        .final-animation.flash {
-            animation: flash 0.5s infinite alternate;
-        }
-        
-        @keyframes flash {
-            from { opacity: 0.8; }
-            to { opacity: 1; }
-        }
-
-        @keyframes spin {
-            to { transform: translate(-50%, -50%) rotate(360deg); }
-        }
-
-        .loading-message {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: var(--text-color);
-            font-size: 16px;
-            opacity: 0;
-            transition: opacity 0.4s ease-in-out;
-            z-index: 1000;
-        }
-
-        /* Адаптивность и темы */
         @media (prefers-reduced-motion: reduce) {
             * { transition: none !important; animation: none !important; }
         }
 
         * { box-sizing: border-box; }
-
-        [data-theme="light"] {
-            --primary-color: #f0f2f5;
-            --text-color: #2d3748;
-        }
-
         [hidden] { display: none !important; }
 
         body {
@@ -97,25 +32,132 @@
             min-height: 100vh;
         }
 
-        /* Индикатор активности аудио */
-        .audio-indicator {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 8px 12px;
-            background: rgba(0, 0, 0, 0.5);
-            color: var(--accent-color);
-            border-radius: 20px;
-            font-size: 14px;
-            font-weight: 500;
-            z-index: 100;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-            pointer-events: none;
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: center;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
 
-        body.audio-active .audio-indicator {
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        h1 {
+            margin: 0 0 4px;
+            font-size: 2.5rem;
+            font-weight: 700;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+            color: var(--accent-color);
+        }
+
+        #themeToggle {
+            padding: 8px 14px;
+            border-radius: var(--border-radius);
+            border: 1px solid var(--secondary-color);
+            background: var(--secondary-color);
+            color: var(--text-color);
+            cursor: pointer;
+            font-weight: 600;
+            transition: transform var(--transition-speed) ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        #themeToggle:hover { transform: scale(1.05); }
+        #themeToggle.active { background: var(--accent-color); color: #000; }
+
+        .fractal-container {
+            width: 100%;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+            padding: 40px 0 70px;
+        }
+
+        #loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+        }
+
+        #loading h1 {
+            color: var(--text-color);
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        #loading-icon {
+            width: 80px;
+            height: 80px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--accent-color);
+            animation: spin 1.5s ease-in-out infinite;
+            margin-bottom: 1rem;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        canvas {
+            display: block;
+            margin: 0 auto;
+            width: 100%;
+            max-width: 640px;
+            aspect-ratio: 1 / 1;
+            height: auto;
+            background-color: #000;
+            border-radius: var(--border-radius);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+            opacity: 0;
+            transform: scale(0.95);
+            transition: opacity 0.8s ease-in-out, transform 0.8s ease-in-out, filter 0.5s ease;
+            cursor: crosshair;
+            filter: blur(2px);
+            margin-top: 20px;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+        }
+        canvas.loaded {
             opacity: 1;
+            transform: scale(1);
+            filter: blur(0);
+        }
+        canvas.painting-mode {}
+        canvas:hover {
+            filter: brightness(1.05);
         }
 
         /* Анимация волны при клике */
@@ -135,101 +177,192 @@
             }
         }
 
-        /* Активность режима "Кинетическая живопись" */
-        .painting-mode-active {
-            animation: blink 1.5s infinite alternate;
-            filter: brightness(1.1);
+        /* Анимация для загрузки */
+        #loading {
+            opacity: 1;
+            transition: opacity 0.5s ease;
+        }
+        #loading.hidden {
+            opacity: 0;
         }
 
-        @keyframes pulse {
-            from { opacity: 1; }
-            to { opacity: 0.9; }
+        /* Анимация появления панели настроек */
+        .controls {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
+        .controls.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        [data-theme="light"] .controls { background-color: rgba(255, 255, 255, 0.85); }
+
+        .control-row {
+            margin-bottom: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            align-items: stretch;
+            text-align: left;
+        }
+
+        label {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-color);
+        }
+
+        input, select, button {
+            font-family: inherit;
+            font-size: 14px;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 28px;
+            background: transparent;
+            cursor: pointer;
+        }
+        input[type="range"]::-webkit-slider-runnable-track {
+            height: 6px;
+            background: var(--secondary-color);
+            border-radius: var(--border-radius);
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            margin-top: -7px;
+            width: 20px;
+            height: 20px;
+            background-color: var(--accent-color);
+            border-radius: 50%;
+            box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
+            transition: transform var(--transition-speed) ease;
+            cursor: pointer;
+        }
+        input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.2); }
+        input[type="range"]::-moz-range-track {
+            height: 6px;
+            background: var(--secondary-color);
+            border-radius: var(--border-radius);
+        }
+        input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            background-color: var(--accent-color);
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        select {
+            background-color: rgba(20, 25, 35, 0.9);
+            color: var(--text-color);
+            padding: 8px;
+            border-radius: var(--border-radius);
+            border: 1px solid var(--secondary-color);
+            transition: border-color var(--transition-speed) ease;
+        }
+        select:hover { border-color: var(--accent-color); }
+
+        .palette-selector {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .palette-option {
+            width: 36px;
+            height: 36px;
+            border-radius: var(--border-radius);
+            border: 2px solid var(--secondary-color);
+            cursor: pointer;
+            transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+        }
+        .palette-option:hover { transform: scale(1.1); }
+        .palette-option.active { border-color: var(--accent-color); box-shadow: 0 0 0 2px var(--accent-color); }
+
+        button {
+            background: var(--palette-gradient);
+            border: none;
+            border-radius: var(--border-radius);
+            color: #ffffff;
+            font-weight: bold;
+            text-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
+            padding: 12px;
+            cursor: pointer;
+            transition: all var(--transition-speed) ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        button:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        button#paintingModeBtn {
+            background: linear-gradient(135deg, #ff6b6b, #ff8e8e);
+        }
+        button#paintingModeBtn.active {
+            outline: 2px solid #ffffff;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+
+        button#paintingModeBtn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        button#exportBtn {
+            background: linear-gradient(to right, #007bff, #0056b3);
+            font-weight: bold;
+            text-shadow: none;
+        }
+
     </style>
+
+    <div class="controls" style="display: flex; flex-direction: column; gap: 10px;">
+        <button id="paintingModeBtn" class="painting-mode-btn" onclick="togglePaintingMode()">
+            Кинетическая живопись
+        </button>
+    </div>
+
     <script>
-        // Показываем анимацию загрузки
-        document.addEventListener('DOMContentLoaded', function() {
-            document.getElementById('loading-spinner').style.display = 'block';
-            document.getElementById('loading-message').style.display = 'block';
+        let isPaintingModeActive = false;
+        const canvas = document.getElementById('fractalCanvas');
+        
+        function togglePaintingMode() {
+            const btn = document.getElementById('paintingModeBtn');
+            isPaintingModeActive = !isPaintingModeActive;
             
-            // Скрываем анимацию загрузки и показываем финальную анимацию
-            window.addEventListener('fractalLoaded', function() {
-                document.getElementById('loading-spinner').style.display = 'none';
-                document.getElementById('loading-message').style.display = 'none';
-                
-                // Показываем финальную анимацию
-                const finalAnimation = document.getElementById('finalAnimation');
-                finalAnimation.style.display = 'block';
-                finalAnimation.classList.add('flash');
-                
-                setTimeout(() => {
-                    finalAnimation.style.opacity = '0';
-                    setTimeout(() => {
-                        finalAnimation.style.display = 'none';
-                        document.getElementById('successMessage').style.display = 'block';
-                        document.getElementById('successMessage').classList.add('success-message-animation');
-                    }, 500);
-                }, 1000);
-            });
-        });
-        
-        // Логика переключения кнопок и индикатора
-        const toggle3DModeBtn = document.getElementById('toggle3DModeBtn');
-        const paintingModeBtn = document.getElementById('paintingModeBtn');
-        const indicator = document.getElementById('indicator');
-        
-        // Начальное состояние кнопок
-        toggle3DModeBtn.classList.remove('fade-in');
-        paintingModeBtn.classList.remove('fade-in');
-        
-        // Начальное положение индикатора
-        indicator.style.transform = 'translateY(0)';
-        
-        // Переключение режимов
-        toggle3DModeBtn.addEventListener('click', function() {
-            this.classList.toggle('active');
-            paintingModeBtn.classList.remove('active');
-            indicator.style.transform = 'translateY(30px)';
-        });
-        
-        paintingModeBtn.addEventListener('click', function() {
-            this.classList.toggle('active');
-            toggle3DModeBtn.classList.remove('active');
-            indicator.style.transform = 'translateY(0)';
-        });
-    </script>
-    <body>
-    <div id="loading-spinner" class="loading-spinner"></div>
-        <div id="loading-message" class="loading-message">Загрузка...</div>
-        <div id="finalAnimation" class="final-animation"></div>
-        <div id="successMessage" class="success-message">Готово!</div>
-        <div id="loading"></div>
-    <div id="app"></div>
-    <div class="container">
-        <div id="successMessage" class="success-message">Готово!</div>
-        <button id="toggle3DModeBtn" class="button">Переключить на 3D</button>
-        <div class="indicator" id="indicator"></div>
-        <button id="paintingModeBtn" class="button active">Кинетическая живопись</button>
-        <div id="audioIndicator" class="audio-indicator">AUDIO: 0</div>
-    </div>
-    <div class="fixed-buttons">
-        <button id="toggle3DModeBtn" class="button">Переключить на 3D</button>
-        <div class="indicator" id="indicator"></div>
-        <button id="paintingModeBtn" class="button active">Кинетическая живопись</button>
-    </div>
-<script src="js/animations.js"></script>
-<script src="js/main.js"></script>
-<script>
-        // Проверка на отключение анимаций
-        const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-        if (prefersReducedMotion) {
-            document.body.classList.add('no-animations');
+            if (isPaintingModeActive) {
+                btn.classList.add('active');
+                initPaintingMode({ canvas }).then(() => {
+                    canvas.classList.add('painting-mode');
+                });
+            } else {
+                btn.classList.remove('active');
+                deactivatePaintingMode();
+                canvas.classList.remove('painting-mode');
+            }
         }
-<footer class="footer">
-    <p>© 2023 Fractal Visualizer. Все права защищены.
-       <a href="https://github.com/vecto01/fractal-visualizer" target="_blank" rel="noopener noreferrer">GitHub</a></p>
-</footer>
-<div id="scroll-trigger"></div>
+        
+        function deactivatePaintingMode() {
+            const paintingMode = window.initPaintingMode;
+            if (paintingMode && paintingMode.deactivate) {
+                paintingMode.deactivate();
+            }
+        }
     </script>
-</body>
-</body>

@@ -35,7 +35,11 @@ const state = {
     juliaCX: -0.7,
     juliaCY: 0.27015,
     paintingMode: false,
+    audioActive: false,
 };
+
+// Объект для управления режимом "Кинетическая живопись"
+let paintingModeController = null;
 
 // ---------- Тема ----------
 function applyTheme(theme) {
@@ -187,6 +191,23 @@ paintingModeBtn.addEventListener('click', () => {
     state.paintingMode = !state.paintingMode;
     paintingModeBtn.classList.toggle('active', state.paintingMode);
     canvas.classList.toggle('painting-mode', state.paintingMode);
+    
+    // Инициализация/деактивация режима "Кинетическая живопись"
+    if (state.paintingMode) {
+        paintingModeController = window.initPaintingMode(canvas, state);
+        paintingModeController.activate();
+        state.audioActive = true;
+    } else {
+        if (paintingModeController) {
+            paintingModeController.deactivate();
+            state.audioActive = false;
+        }
+    }
+    
+    // Обновление параметров фрактала при изменении звука
+    if (state.audioActive) {
+        requestAnimationFrame(render);
+    }
 });
 
 canvas.addEventListener('click', (e) => {

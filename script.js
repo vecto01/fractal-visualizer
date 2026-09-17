@@ -422,20 +422,50 @@ if (canvas) {
 const startBtn = document.getElementById('start-btn');
 if (startBtn) {
     startBtn.addEventListener('click', () => {
-        console.log('Visualization started with:', {
-            depth: document.getElementById('recursion-depth').value,
-            points: document.getElementById('point-count').value
-        });
+        // Добавляем состояние загрузки
+        startBtn.classList.add('loading');
+        const span = document.createElement('span');
+        span.textContent = translations[currentLanguage].loadingMessage;
+        startBtn.innerHTML = '';
+        startBtn.appendChild(span);
+        
+        // Логика визуализации (заменяем на реальную или имитацию)
+        setTimeout(() => {
+            // Убираем состояние загрузки
+            startBtn.classList.remove('loading');
+            startBtn.textContent = translations[currentLanguage].startButton;
+            
+            // Показываем сообщение об успешной визуализации и запускаем анимацию фрактала
+            const fractalContainer = document.getElementById('fractal-container');
+            fractalContainer.style.animation = 'fadeIn 1.5s ease-out forwards';
+            fractalContainer.style.animationPlayState = 'running';
+            
+            displaySuccessMessage();
+        }, 2000); // Имитация процесса
     });
 }
 
+// Показать сообщение об успешной визуализации
+// Функция для отображения сообщения об успешной визуализации
+const displaySuccessMessage = () => {
+    const successMessage = document.getElementById('success-message');
+    if (successMessage) {
+        successMessage.style.animation = 'slideUp 0.5s ease-out forwards';
+        successMessage.style.animationPlayState = 'running';
+    }
+};
+
 // Обработчик для скрытия сообщения об успешной визуализации
-const successMessage = document.getElementById('success-message');
+
 if (successMessage) {
     successMessage.addEventListener('click', () => {
         successMessage.style.opacity = '0';
         successMessage.style.transform = 'translateY(20px) scale(0.95)';
         successMessage.style.pointerEvents = 'none';
+        
+        setTimeout(() => {
+            successMessage.style.display = 'none';
+        }, 300);
     });
 }
 
@@ -460,8 +490,29 @@ const startVisualizationBtn = document.getElementById('start-visualization-btn')
 if (startVisualizationBtn) {
     startVisualizationBtn.addEventListener('click', () => {
         console.log('Starting visualization...');
+        const loadingScreen = document.getElementById('loading');
+        const fractalContainer = document.getElementById('fractal-container');
+        const successMessage = document.getElementById('success-message');
+        
+        // Скрываем экран загрузки
         loadingScreen.style.opacity = '0';
-        fractalContainer.style.opacity = '1';
+        loadingScreen.style.transform = 'translateY(20px)';
+        loadingScreen.style.position = 'fixed';
+        loadingScreen.style.width = '100%';
+        loadingScreen.style.top = '0';
+        loadingScreen.style.transition = 'opacity 0.5s ease-out, transform 0.5s ease-out';
+        
+        // Показываем контейнер с фракталом
+        setTimeout(() => {
+            fractalContainer.style.animation = 'fadeIn 1.5s ease-out forwards';
+            fractalContainer.style.animationPlayState = 'running';
+        }, 500);
+        
+        // Показываем сообщение об успешной визуализации
+        setTimeout(() => {
+            successMessage.style.animation = 'slideUp 0.5s ease-out forwards';
+            successMessage.style.animationPlayState = 'running';
+        }, 1000);
     });
 }
 

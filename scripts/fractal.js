@@ -187,15 +187,15 @@ fractalTypeSelect.addEventListener('change', () => {
     render();
 });
 
-paintingModeBtn.addEventListener('click', () => {
+paintingModeBtn.addEventListener('click', async () => {
     state.paintingMode = !state.paintingMode;
     paintingModeBtn.classList.toggle('active', state.paintingMode);
     canvas.classList.toggle('painting-mode', state.paintingMode);
     
     // Инициализация/деактивация режима "Кинетическая живопись"
     if (state.paintingMode) {
-        paintingModeController = window.initPaintingMode(canvas, state);
-        paintingModeController.activate();
+        paintingModeController = window.initPaintingMode({ canvas });
+        await paintingModeController.activate();
         state.audioActive = true;
     } else {
         if (paintingModeController) {

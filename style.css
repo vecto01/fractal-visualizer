@@ -1,0 +1,80 @@
+/* Стили для фрактала */
+
+#fractalCanvas {
+    background: #1a1a1a;
+    border-radius: 8px;
+    box-shadow: 0 0 20px rgba(0, 100, 255, 0.3);
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+
+#fractalCanvas:hover {
+    box-shadow: 0 0 30px rgba(0, 100, 255, 0.5);
+}
+
+#fractalCanvas.click-feedback {
+    border: 2px solid rgba(0, 100, 255, 0.7);
+    animation: pulse 0.5s ease-out;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+.wave-animation {
+    animation: wave 1.5s ease-out;
+}
+
+@keyframes wave {
+    0% { opacity: 0.8; }
+    100% { opacity: 1; }
+}
+
+/* Микровзаимодействия для кнопок */
+.painting-mode-btn {
+    background-color: #4a4a4a;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-weight: 500;
+}
+
+.painting-mode-btn:hover {
+    background-color: #5a5a5a;
+    transform: translateY(-2px);
+}
+
+.painting-mode-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.painting-mode-btn.active {
+    background-color: #00a0ff;
+    color: #1a1a1a;
+    animation: pulse-btn 0.5s ease-out;
+}
+
+@keyframes pulse-btn {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.08); }
+    100% { transform: scale(1); }
+}
+
+/* Сообщение о загрузке */
+#loadingMessage {
+    display: none;
+    text-align: center;
+    color: #bbb;
+    font-size: 16px;
+    margin-top: 10px;
+}
+
+#loadingMessage.visible {
+    display: block;
+}

@@ -1,94 +1,115 @@
-// ===== Кинетическая живопись =====
-// Режим, в котором фрактал изменяется под воздействием звука или клавиатуры.
+// ===== Режим "Кинетическая живопись" ====
+// Обработка звука и синхронизация с фракталом
 
 /**
  * Инициализация режима "Кинетическая живопись"
- * @param {Object} canvas - Элемент canvas для рендеринга фрактала
- * @param {Object} fractalParams - Параметры фрактала для изменения
+ * @param {Object} options - Параметры режима
+ * @param {HTMLCanvasElement} canvas - Канвас для рендеринга
  */
-const initPaintingMode = (canvas, fractalParams) => {
-    const ctx = canvas.getContext('2d');
+const initPaintingMode = async (options) => {
+    const { canvas } = options;
     let audioContext;
     let analyser;
-    let audioSource;
     let dataArray;
-    let animationId;
+    let animationFrameId;
     let isActive = false;
+    let lastTime = 0;
+    let lastClick = { x: 0, y: 0 }; // Добавлена переменная для хранения последнего клика
     
     // Инициализация Web Audio API
-    const initAudio = () => {
-        audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        analyser = audioContext.createAnalyser();
-        analyser.fftSize = 256;
-        
-        // Настройка обработки аудиопотока
-        dataArray = new Uint8Array(analyser.frequencyBinCount);
-        analyser.getByteFrequencyData(dataArray);
-    };
-    
-    // Обработка аудиоданных для изменения параметров фрактала
-    const updateFractalFromAudio = () => {
-        if (!isActive) return;
-        
-        analyser.getByteFrequencyData(dataArray);
-        
-        // Пример: изменение параметров фрактала в зависимости от частоты
-        const avgFrequency = dataArray.reduce((sum, val) => sum + val, 0) / dataArray.length;
-        
-        // Изменение zoom
-        const zoomFactor = 1 + (avgFrequency / 255) * 0.5;
-        fractalParams.zoom = Math.max(0.1, Math.min(5, fractalParams.zoom * zoomFactor));
-        
-        // Изменение смещения центра фрактала
-        const centerOffsetX = (Math.random() - 0.5) * 0.005 * avgFrequency;
-        const centerOffsetY = (Math.random() - 0.5) * 0.005 * avgFrequency;
-        
-        fractalParams.centerX += centerOffsetX;
-        fractalParams.centerY += centerOffsetY;
-    };
-    
-    // Обработка клавиатуры для ручного изменения параметров
-    const handleKeyboardInput = (event) => {
-        switch (event.key) {
-            case 'ArrowUp':
-                fractalParams.zoom *= 0.9;
-                break;
-            case 'ArrowDown':
-                fractalParams.zoom *= 1.1;
-                break;
-            case 'ArrowLeft':
-                fractalParams.xOffset -= 0.01;
-                break;
-            case 'ArrowRight':
-                fractalParams.xOffset += 0.01;
-                break;
-            default:
-                break;
+    const initAudio = async () => {
+        try {
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            analyser = audioContext.createAnalyser();
+            analyser.fftSize = 256;
+            dataArray = new Uint8Array(analyser.frequencyBinCount);
+            
+            // Подключение микрофона
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            const microphone = audioContext.createMediaStreamSource(stream);
+            microphone.connect(analyser);
+            
+            return true;
+        } catch (error) {
+            console.error("Ошибка инициализации аудио:", error);
+            return false;
         }
     };
     
-    // Активация режима
-    const activate = () => {
-        if (isActive) return;
-        isActive = true;
-        initAudio();
-        document.addEventListener('keydown', handleKeyboardInput);
-        animationId = requestAnimationFrame(updateFractalFromAudio);
-    };
-    
-    // Деактивация режима
-    const deactivate = () => {
+    // Анализ аудиопотока и изменение параметров фрактала
+    const updateFractal = (timestamp) => {
         if (!isActive) return;
-        isActive = false;
-        document.removeEventListener('keydown', handleKeyboardInput);
-        cancelAnimationFrame(animationId);
+        
+        analyser.getByteFrequencyData(dataArray);
+        const avg = dataArray.reduce((a, b) => a + b, 0) / dataArray.length;
+        const timeDiff = timestamp - lastTime;
+        lastTime = timestamp;
+        
+        // Кэширование значений для оптимизации
+        const cachedAvg = avg;
+        const cachedTimeDiff = timeDiff;
+        
+        // Определение скорости анимации в зависимости от устройства
+        const isMobile = window.innerWidth < 768;
+        const speedFactor = isMobile ? 0.7 : 1.0;
+        
+        // Изменение параметров фрактала на основе аудио с учетом адаптивности
+        const fractalParams = {
+            zoom: 1 + (cachedAvg / 255) * 0.3 * speedFactor,
+            rotation: Math.sin(timestamp / 1500 * speedFactor) * 0.05,
+            xOffset: 0,
+            yOffset: 0,
+            timeFactor: cachedTimeDiff / 1000 * speedFactor
+        };
+        
+        // Обновление фрактала с минимальной задержкой
+        if (typeof window.updateFractal === 'function') {
+            window.updateFractal({
+                ...fractalParams,
+                xOffset: lastClick.x / canvas.width * 0.1,
+                yOffset: lastClick.y / canvas.height * 0.1
+            });
+        }
+        
+        // Запланируем следующий кадр с использованием requestAnimationFrame
+        animationFrameId = requestAnimationFrame(updateFractal);
     };
     
-    return {
-        activate,
-        deactivate,
+    // Запуск режима
+    const activate = async () => {
+        if (await initAudio()) {
+            isActive = true;
+            animationFrameId = requestAnimationFrame(updateFractal);
+            console.log("Режим 'Кинетическая живопись' активирован");
+        }
+    }
+    
+    // Остановка режима
+    const deactivate = () => {
+        if (animationFrameId) {
+            cancelAnimationFrame(animationFrameId);
+        }
+        isActive = false;
+        console.log("Режим 'Кинетическая живопись' остановлен");
+    }
+
+    // Обработчик кликов на канвас
+    const handleCanvasClick = (e) => {
+        if (e.target === canvas) {
+            lastClick = {
+                x: e.clientX,
+                y: e.clientY
+            };
+            console.log('Клик на канвас:', lastClick);
+        }
     };
+
+    // Экспорт функций
+    return {
+        handleCanvasClick,
+    };
+
 };
 
-// Глобальная регистрация функции
+// ===== Экспорт ====
 window.initPaintingMode = initPaintingMode;

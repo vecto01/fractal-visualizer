@@ -10,6 +10,9 @@
     <button class="theme-toggle" aria-label="Toggle dark mode">
         <span class="moon-icon" aria-hidden="true">☽</span>
     </button>
+    <button class="language-toggle" aria-label="Toggle language">
+        <span class="language-text" id="language-text">EN</span>
+    </button>
     <div id="loading">
         <div class="container">
             <h1>Fractal Visualizer</h1>
@@ -43,7 +46,9 @@
         </div>
         <div class="fixed-buttons">
             <button id="start-btn" class="fade-in" tabindex="0">Start</button>
-            <button id="export-btn" class="fade-in" tabindex="0">Export</button>
+            <button id="export-btn" class="fade-in" tabindex="0">
+                Export <span class="export-format">PNG</span>
+            </button>
             <button id="clear-btn" class="fade-in" tabindex="0">Clear</button>
         </div>
     </div>
@@ -54,4 +59,20 @@
         </div>
     </footer>
 </body>
+    <!-- Модальное окно экспорта -->
+    <div id="export-modal" class="modal" role="dialog" aria-hidden="true">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button class="modal-close" aria-label="Close modal">×</button>
+                <h2>Export Complete</h2>
+            </div>
+            <div class="modal-body">
+                <p>Your fractal has been exported successfully!</p>
+                <p id="export-filename"></p>
+            </div>
+            <div class="modal-footer">
+                <button id="close-modal-btn" class="modal-button">Close</button>
+            </div>
+        </div>
+    </div>
 </html>

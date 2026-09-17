@@ -5,6 +5,72 @@ function debounce(func, delay) {
         clearTimeout(timeoutId);
         timeoutId = setTimeout(() => func.apply(this, args), delay);
     };
+};
+
+// Объект локализации
+const translations = {
+    en: {
+        loadingTitle: "Fractal Visualizer",
+        loadingMessage: "Loading fractal...",
+        startButton: "Start Visualization",
+        successMessage: "Visualization complete!",
+        languageButton: "English",
+        themeButton: "Dark Mode",
+        languageFlag: "🇬🇧"
+    },
+    ru: {
+        loadingTitle: "Визуализатор Фракталов",
+        loadingMessage: "Загрузка фрактала...",
+        startButton: "Начать Визуализацию",
+        successMessage: "Визуализация завершена!",
+        languageButton: "Русский",
+        themeButton: "Тёмная Тема",
+        languageFlag: "🇷🇺"
+    }
+};
+
+// Текущий язык
+// Загружаем сохранённый язык из localStorage или используем значение по умолчанию
+let currentLanguage = localStorage.getItem('language') || 'en';
+
+// Функция для обновления текста на странице
+function updateText() {
+    const t = translations[currentLanguage];
+    document.querySelector('#loading h1').textContent = t.loadingTitle;
+    document.querySelector('.loading-message').textContent = t.loadingMessage;
+    document.querySelector('#start-visualization-btn').textContent = t.startButton;
+    document.querySelector('#success-message').textContent = t.successMessage;
+    document.querySelector('.language-toggle').setAttribute('aria-label', `Switch to ${t.languageButton}`);
+    document.querySelector('.theme-toggle').setAttribute('aria-label', `Toggle ${t.themeButton}`);
+    
+    // Обновляем текст и флаг кнопки переключения языка
+    const languageToggle = document.querySelector('.language-toggle');
+    if (languageToggle) {
+        const t = translations[currentLanguage];
+        const flagSpan = document.createElement('span');
+        flagSpan.textContent = t.languageFlag;
+        flagSpan.className = 'language-flag';
+        
+        const textSpan = document.createElement('span');
+        textSpan.textContent = currentLanguage === 'en' ? 'EN' : 'РУ';
+        textSpan.className = 'language-text';
+        
+        // Очищаем старый контент
+        while (languageToggle.firstChild) {
+            languageToggle.removeChild(languageToggle.firstChild);
+        }
+        
+        // Добавляем флаг и текст
+        languageToggle.appendChild(flagSpan);
+        languageToggle.appendChild(textSpan);
+    }
+}
+
+// Функция для переключения языка
+function toggleLanguage() {
+    currentLanguage = currentLanguage === 'en' ? 'ru' : 'en';
+    updateText();
+    localStorage.setItem('language', currentLanguage);
 }
 
 // Создание эффекта ripple при нажатии на кнопку
@@ -281,7 +347,62 @@ initSliderHandlers();
 // ===== Экспорт анимации =====
 const exportAnimation = () => {
     console.log('Экспорт анимации');
-    // TODO: Реализовать экспорт анимации в GIF/MP4
+    
+    // Открытие модального окна
+    const modal = document.getElementById('export-modal');
+    const closeBtn = document.querySelector('.modal-close');
+    const closeModalBtn = document.getElementById('close-modal-btn');
+    const body = document.body;
+    
+    // Добавляем класс для блокировки скролла
+    body.classList.add('no-scroll');
+    
+    // Показываем модальное окно с анимацией
+    modal.style.opacity = '0';
+    modal.style.transform = 'translateY(20px)';
+    modal.style.pointerEvents = 'none';
+    modal.style.zIndex = '1000';
+    
+    setTimeout(() => {
+        modal.style.opacity = '1';
+        modal.style.transform = 'translateY(0)';
+        modal.style.pointerEvents = 'auto';
+        modal.setAttribute('aria-hidden', 'false');
+    }, 10);
+    
+    // Закрытие модального окна по кнопке "Close" или крестику
+    const closeModal = () => {
+        modal.style.opacity = '1';
+        modal.style.transform = 'translateY(0)';
+        modal.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+        
+        setTimeout(() => {
+            modal.style.opacity = '0';
+            modal.style.transform = 'translateY(20px)';
+            modal.style.pointerEvents = 'none';
+            modal.setAttribute('aria-hidden', 'true');
+            
+            setTimeout(() => {
+                // Убираем класс для разблокировки скролла
+                body.classList.remove('no-scroll');
+                
+                // Звуковой эффект закрытия (если поддерживается)
+                if (typeof Audio !== 'undefined') {
+                    const closeSound = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-casino-chip-drop-216.mp3');
+                    closeSound.volume = 0.2;
+                    closeSound.play().catch(e => console.log('Звук не воспроизведён:', e));
+                }
+            }, 300);
+        }, 10);
+    };
+    
+    // Привязываем обработчики закрытия
+    closeBtn.addEventListener('click', closeModal);
+    closeModalBtn.addEventListener('click', closeModal);
+    
+    // Добавляем имя файла (например, случайное или фиксированное)
+    const filename = `fractal_${Date.now()}.png`;
+    document.getElementById('export-filename').textContent = `File: ${filename}`;
 };
 
 // Запуск инициализации 3D-рендера
@@ -436,3 +557,12 @@ if (startVisualizationBtn) {
             }
         });
     }
+
+    // Инициализация переключателя языка
+    const languageToggle = document.querySelector('.language-toggle');
+    if (languageToggle) {
+        languageToggle.addEventListener('click', toggleLanguage);
+    }
+    
+    // Обновление текста при загрузке страницы
+    updateText();

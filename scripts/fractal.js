@@ -10,6 +10,38 @@ const palettes = {
     EarthTones: [[139, 69, 19], [205, 133, 63], [255, 215, 0], [102, 205, 170], [0, 100, 0], [128, 0, 0]],
 };
 
+// Локализация
+const translations = {
+    ru: {
+        loading: 'Загрузка фрактала...',
+        palette: 'Палитра',
+        iterations: 'Итерации',
+        zoom: 'Масштаб',
+        fractalType: 'Тип фрактала',
+        mandelbrot: 'Мандельброт',
+        julia: 'Джулия',
+        paintingMode: 'Режим рисования',
+        export: 'Экспорт',
+        exportComplete: 'Экспорт завершён!',
+        themeToggle: 'Тёмная тема',
+        successMessage: 'Фрактал успешно визуализирован!',
+    },
+    en: {
+        loading: 'Loading fractal...',
+        palette: 'Palette',
+        iterations: 'Iterations',
+        zoom: 'Zoom',
+        fractalType: 'Fractal Type',
+        mandelbrot: 'Mandelbrot',
+        julia: 'Julia',
+        paintingMode: 'Painting Mode',
+        export: 'Export',
+        exportComplete: 'Export complete!',
+        themeToggle: 'Dark Theme',
+        successMessage: 'Fractal successfully visualized!',
+    }
+};
+
 const canvas = document.getElementById('fractalCanvas');
 const ctx = canvas.getContext('2d');
 const loadingEl = document.getElementById('loading');
@@ -35,27 +67,79 @@ const state = {
     juliaCX: -0.7,
     juliaCY: 0.27015,
     paintingMode: false,
-    audioActive: false,
+    isLowEndDevice: false,
 };
 
-// Объект для управления режимом "Кинетическая живопись"
-let paintingModeController = null;
+// Локализация
+let currentLanguage = 'ru';
+function setLanguage(lang) {
+    currentLanguage = lang;
+    localStorage.setItem('fractal-language', lang);
+    updateUILanguage();
+}
+
+function updateUILanguage() {
+    const t = translations[currentLanguage];
+    loadingEl.textContent = t.loading;
+    paletteSelector.querySelector('h3').textContent = t.palette;
+    iterationsInput.previousElementSibling.textContent = t.iterations;
+    zoomInput.previousElementSibling.textContent = t.zoom;
+    fractalTypeSelect.previousElementSibling.textContent = t.fractalType;
+    paintingModeBtn.textContent = t.paintingMode;
+    exportBtn.textContent = t.export;
+    themeToggle.textContent = t.themeToggle;
+    exportCompleteEl.textContent = t.exportComplete;
+    
+    // Обновляем опции типов фракталов
+    fractalTypeSelect.options[0].text = t.mandelbrot;
+    fractalTypeSelect.options[1].text = t.julia;
+}
+
+// Проверка на слабое устройство
+function detectLowEndDevice() {
+    if (!navigator.deviceMemory) return false;
+    // Меньше 2GB ОЗУ считаем слабым устройством
+    return navigator.deviceMemory <= 2;
+}
+
+// Настройка параметров для слабых устройств
+function setupDeviceSpecificSettings() {
+    state.isLowEndDevice = detectLowEndDevice();
+    if (state.isLowEndDevice) {
+        // Уменьшаем количество итераций для слабых устройств
+        iterationsInput.value = 40;
+        iterationsInput.max = 60;
+        iterationsInput.min = 20;
+        iterationsValue.textContent = 40;
+        state.iterations = 40;
+    }
+}
+
+// Инициализация языка
+function initLanguage() {
+    let savedLang = localStorage.getItem('fractal-language');
+    if (savedLang && translations[savedLang]) {
+        currentLanguage = savedLang;
+    } else {
+        // Проверяем настройки браузера
+        const browserLang = navigator.language || navigator.userLanguage;
+        if (browserLang.startsWith('en')) currentLanguage = 'en';
+    }
+    updateUILanguage();
+}
 
 // ---------- Тема ----------
 function applyTheme(theme) {
     document.documentElement.dataset.theme = theme;
     themeToggle.textContent = theme === 'light' ? '☀️ Светлая тема' : '🌙 Тёмная тема';
-    themeToggle.classList.toggle('active', theme === 'light');
     try { localStorage.setItem('fractal-theme', theme); } catch (e) { /* приватный режим */ }
 }
-
 (function initTheme() {
     let saved = null;
     try { saved = localStorage.getItem('fractal-theme'); } catch (e) { /* приватный режим */ }
     const prefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
     applyTheme(saved || (prefersLight ? 'light' : 'dark'));
 })();
-
 themeToggle.addEventListener('click', () => {
     applyTheme(document.documentElement.dataset.theme === 'light' ? 'dark' : 'light');
 });
@@ -135,18 +219,18 @@ function renderJulia(width, height, maxIter, palette) {
 }
 
 let renderPending = false;
-function showLoading() {
-    loadingEl.style.display = 'flex';
-}
+function showLoading() { loadingEl.hidden = false; }
+function hideLoading() { loadingEl.hidden = true; }
 
-function hideLoading() {
-    loadingEl.style.display = 'none';
+let debounceTimer = null;
+function debounceRender() {
+    if (debounceTimer) clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(render, state.isLowEndDevice ? 100 : 0);
 }
 
 function render() {
     if (renderPending) return;
     renderPending = true;
-    showLoading();
     requestAnimationFrame(() => {
         const width = canvas.width, height = canvas.height;
         const palette = palettes[state.palette];
@@ -155,19 +239,9 @@ function render() {
             : renderMandelbrot(width, height, state.iterations, palette);
         ctx.putImageData(imageData, 0, 0);
         renderPending = false;
-        hideLoading();
     });
-<<<<<<< HEAD
-    
-    // Оптимизация для плавных анимаций
-    if (state.paintingMode && state.audioActive) {
-        requestAnimationFrame(render);
-    }
-}
-=======
 }
 
->>>>>>> 0f94417c702024c8c962dd6f9ac41c1a75e899ef
 // ---------- Управление ----------
 function resizeCanvas() {
     const size = Math.round(Math.min(canvas.clientWidth || 640, 640));
@@ -181,13 +255,13 @@ function resizeCanvas() {
 iterationsInput.addEventListener('input', () => {
     state.iterations = parseInt(iterationsInput.value, 10);
     iterationsValue.textContent = state.iterations;
-    render();
+    debounceRender();
 });
 
 zoomInput.addEventListener('input', () => {
     state.zoom = parseFloat(zoomInput.value);
     zoomValue.textContent = state.zoom.toFixed(1);
-    render();
+    debounceRender();
 });
 
 fractalTypeSelect.addEventListener('change', () => {
@@ -196,27 +270,10 @@ fractalTypeSelect.addEventListener('change', () => {
     render();
 });
 
-paintingModeBtn.addEventListener('click', async () => {
+paintingModeBtn.addEventListener('click', () => {
     state.paintingMode = !state.paintingMode;
     paintingModeBtn.classList.toggle('active', state.paintingMode);
     canvas.classList.toggle('painting-mode', state.paintingMode);
-    
-    // Инициализация/деактивация режима "Кинетическая живопись"
-    if (state.paintingMode) {
-        paintingModeController = window.initPaintingMode({ canvas });
-        await paintingModeController.activate();
-        state.audioActive = true;
-    } else {
-        if (paintingModeController) {
-            paintingModeController.deactivate();
-            state.audioActive = false;
-        }
-    }
-    
-    // Обновление параметров фрактала при изменении звука
-    if (state.audioActive) {
-        requestAnimationFrame(render);
-    }
 });
 
 canvas.addEventListener('click', (e) => {
@@ -260,7 +317,7 @@ function exportSVG() {
     img.setAttribute('height', canvas.height);
     svg.appendChild(img);
     const svgStr = new XMLSerializer().serializeToString(svg);
-    const blob = new Blob([svgStr], { type: 'image/svg+xml' }); 
+    const blob = new Blob([svgStr], { type: 'image/svg+xml' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.download = 'fractal.svg';
@@ -270,19 +327,10 @@ function exportSVG() {
 }
 
 exportBtn.addEventListener('click', () => {
-<<<<<<< HEAD
-    if (exportFormatSelect.value === 'gif') {
-        exportGIF();
-    } else if (exportFormatSelect.value === 'svg') {
-        exportSVG();
-    } else {
-        exportPNG();
-    }
-=======
     if (exportFormatSelect.value === 'svg') exportSVG(); else exportPNG();
->>>>>>> 0f94417c702024c8c962dd6f9ac41c1a75e899ef
     exportCompleteEl.hidden = false;
     exportCompleteEl.style.animation = 'none';
+    // перезапуск CSS-анимации появления
     void exportCompleteEl.offsetWidth;
     exportCompleteEl.style.animation = '';
     setTimeout(() => { exportCompleteEl.hidden = true; }, 2000);
@@ -290,21 +338,10 @@ exportBtn.addEventListener('click', () => {
 
 window.addEventListener('resize', resizeCanvas);
 
-<<<<<<< HEAD
-// ---------- Обновление параметров фрактала ----------
-window.updateFractal = (params) => {
-    state.zoom = Math.max(0.1, Math.min(params.zoom, 200));
-    state.centerX = params.xOffset || state.centerX;
-    state.centerY = params.yOffset || state.centerY;
-    state.juliaCX = params.juliaCX || state.juliaCX;
-    state.juliaCY = params.juliaCY || state.juliaCY;
-    render();
-};
-
-=======
->>>>>>> 0f94417c702024c8c962dd6f9ac41c1a75e899ef
 // ---------- Инициализация ----------
 buildPaletteSelector();
+initLanguage();
+setupDeviceSpecificSettings();
 resizeCanvas();
 render();
 loadingEl.hidden = true;

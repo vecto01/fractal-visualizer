@@ -1,31 +1,121 @@
-.loading-spinner {
+:root {
+    --bg-color: #121212;
+    --text-color: #f0f2f5;
+    --accent-color: #00a0ff;
+    --btn-bg: #333;
+    --btn-text: #fff;
+    --btn-hover: #4a4a4a;
+    --btn-active-text: #fff;
+    --palette-bg: #2a2a2a;
+    --palette-text: #fff;
+    --contrast-high: #f0f2f5;
+    --contrast-low: #121212;
+    --transition-speed: 0.3s;
+    --easing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    --reduced-motion: none;
+    --border-radius: 8px;
+}
+
+/* Темная тема */
+[data-theme="dark"] {
+    --bg-color: #121212;
+    --text-color: #f0f2f5;
+    --accent-color: #00a0ff;
+    --btn-bg: #333;
+    --btn-text: #fff;
+    --btn-hover: #4a4a4a;
+    --palette-bg: #1e1e1e;
+    --palette-text: #fff;
+}
+
+/* Светлая тема */
+[data-theme="light"] {
+    --bg-color: #f5f5f5;
+    --text-color: #333;
+    --accent-color: #0078d4;
+    --btn-bg: #e0e0e0;
+    --btn-text: #333;
+    --btn-hover: #d0d0d0;
+    --palette-bg: #ffffff;
+    --palette-text: #333;
+}
+
+/* Переключатель тем */
+.theme-toggle {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    background: var(--btn-bg);
+    color: var(--btn-text);
+    border: none;
+    border-radius: 50%;
     width: 40px;
     height: 40px;
-    border: 8px solid rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition-speed) ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.theme-toggle:hover {
+    transform: scale(1.1);
+}
+
+.theme-toggle:focus {
+    outline: 2px solid var(--accent-color);
+    outline-offset: 2px;
+}
+
+.theme-toggle .moon-icon {
+    font-size: 18px;
+    transition: transform 0.3s ease;
+}
+
+.theme-toggle[data-theme="light"] .moon-icon {
+    transform: rotate(45deg);
+}
+
+.theme-toggle[data-theme="dark"] .moon-icon {
+    transform: rotate(0deg);
+}
+
+.loading-spinner {
+    height: 50px;
+    width: 50px;
+    border: 6px solid rgba(0, 0, 0, 0.1);
     border-radius: 50%;
-    border-top-color: #00FFFF;
-    border-left-color: #00FFFF;
-    animation: spin 1s ease-in-out infinite;
+    border-top-color: var(--accent-color);
+    border-left-color: var(--accent-color);
+    animation: spin 1s linear infinite;
     margin: 20px auto;
     display: block;
     opacity: 0;
-    transition: all 0.5s ease-out;
-    box-shadow: 0 0 0 5px rgba(0, 255, 255, 0.5);
+    transition: opacity 0.8s ease-out, transform 0.3s ease-out;
+    box-shadow: 0 0 0 8px rgba(0, 160, 255, 0.3);
+}
+
+.loading-spinner.active {
+    opacity: 1;
+    transform: scale(1);
 }
 
 .loading-message {
     text-align: center;
     margin-top: 20px;
-    color: #FFFFFF;
+    color: var(--accent-color);
     font-size: clamp(16px, 3vw, 20px);
     font-weight: 500;
     opacity: 0;
-    transition: opacity 0.5s ease-out;
+    transition: opacity 0.8s ease-out 0.3s, transform 0.3s ease-out;
+    transform: translateY(10px);
 }
 
-.loading-spinner:hover {
-    transform: scale(1.1);
-    box-shadow: 0 0 0 8px rgba(0, 255, 255, 0.8);
+.loading-message.active {
+    opacity: 1;
+    transform: translateY(0);
 }
 
 #loading {
@@ -93,51 +183,87 @@
 
 button {
     padding: 14px 28px;
-    margin: 12px 0;
+    margin: 10px 0;
     border: none;
-    border-radius: 8px;
-    background-color: #00D4FF;
-    color: #121212;
+    border-radius: 10px;
+    background-color: var(--accent-color);
+    color: #fff;
     cursor: pointer;
     font-size: 16px;
     font-weight: 600;
-    transition: all 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     opacity: 0;
     transform: translateY(10px);
-    display: block;
-    width: 100%;
+    display: inline-block;
     max-width: 300px;
-    margin-left: auto;
-    margin-right: auto;
-    box-shadow: 0 2px 6px rgba(0, 212, 255, 0.3);
-    border: 1px solid rgba(0, 212, 255, 0.5);
+    margin: 0 auto;
+    box-shadow: 0 3px 8px rgba(0, 160, 255, 0.4);
+    border: 1px solid rgba(0, 160, 255, 0.4);
+    position: relative;
+    overflow: hidden;
+    will-change: transform, box-shadow, opacity;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 button:hover {
-    background-color: #00B8FF;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 10px rgba(0, 184, 255, 0.4);
+    background-color: #0099cc;
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0, 143, 208, 0.6);
+    z-index: 1;
 }
 
 button.active {
-    background-color: #FF6B6B;
+    background-color: #0077cc;
     transform: translateY(-4px);
-    box-shadow: 0 6px 12px rgba(255, 107, 107, 0.4);
+    box-shadow: 0 6px 16px rgba(0, 119, 204, 0.5);
 }
 
 button:focus {
-    outline: 2px solid #00FFFF;
+    outline: 2px solid #00d4ff;
     outline-offset: 2px;
+    box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.5);
 }
 
 button:active {
     transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Эффект ripple (волна при нажатии) */
+button::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 5px;
+    height: 5px;
+    background: rgba(255, 255, 255, 0.5);
+    opacity: 0;
+    border-radius: 100%;
+    transform: scale(0, 0);
+    transform-origin: 50% 50%;
+    transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+    pointer-events: none;
+}
+
+button:active::after {
+    transform: scale(2, 2);
+    opacity: 0;
+    animation: ripple 0.6s linear;
+}
+
+@keyframes ripple {
+    to {
+        transform: scale(10, 10);
+        opacity: 0;
+    }
 }
 
 button#start-visualization-btn {
-    background-color: #00BFFF;
+    background-color: var(--accent-color);
     animation: pulse 1.5s infinite;
     transform-origin: center;
+    box-shadow: 0 0 0 5px rgba(0, 176, 255, 0.2);
 }
 
 button#start-visualization-btn:hover {
@@ -148,28 +274,52 @@ button#start-visualization-btn:hover {
 
 button#start-visualization-btn:active {
     transform: scale(0.98);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .success-message {
-    color: #FFFFFF;
+    color: var(--accent-color);
     font-size: clamp(18px, 3vw, 24px);
-    margin-bottom: 20px;
+    margin: 20px auto;
     opacity: 0;
-    animation: fadeIn 1s ease-out forwards;
-    padding: 10px 20px;
-    background-color: rgba(0, 255, 0, 0.1);
-    border-radius: 8px;
-    display: inline-block;
-    border: 1px solid rgba(46, 204, 113, 0.3);
+    animation: none;
+    padding: 16px 24px;
+    background-color: rgba(0, 160, 255, 0.15);
+    border-radius: 12px;
+    display: block;
+    border: 1px solid rgba(0, 160, 255, 0.3);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    max-width: 80%;
+    transition: all 0.3s ease;
+    transform: translateY(20px);
 }
 
-@keyframes fadeIn {
-    to { opacity: 1; }
+.success-message.active {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
 }
 
 @keyframes fadeInButton {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 button.fade-in {
@@ -184,15 +334,82 @@ button.fade-in:nth-child(3) {
     animation-delay: 0.4s;
 }
 
-.fixed-buttons button {
-    width: 80%;
-    margin: 10px auto;
-    padding: 10px;
+.controls-panel {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 12px 20px;
+    background-color: rgba(0, 0, 0, 0.9);
+    backdrop-filter: blur(8px);
+    border-top: 1px solid rgba(0, 160, 255, 0.3);
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    transition: all 0.3s ease;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.5);
+}
+
+.slider-container {
+    width: 100%;
+    margin-bottom: 12px;
+}
+
+.slider-container label {
+    display: block;
+    margin-bottom: 6px;
+    color: var(--text-color);
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.slider-container input[type="range"] {
+    width: 100%;
+    height: 6px;
+    -webkit-appearance: none;
+    background: rgba(0, 160, 255, 0.3);
+    border-radius: 3px;
+    outline: none;
+    margin-bottom: 8px;
+}
+
+.slider-container input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    background: var(--accent-color);
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.3);
+    transition: transform 0.2s ease;
+}
+
+.slider-container input[type="range"]:focus-visible::-webkit-slider-thumb {
+    box-shadow: 0 0 0 5px rgba(0, 160, 255, 0.5);
+    transform: scale(1.2);
+}
+
+.slider-container .value {
+    text-align: center;
+    color: var(--accent-color);
+    font-weight: 600;
     font-size: 14px;
 }
 
-.fixed-buttons button + button {
-    margin-top: 10px;
+.fixed-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+}
+
+.fixed-buttons button {
+    width: 100%;
+    margin: 0 auto;
+    padding: 12px;
+    font-size: 16px;
+    min-width: 200px;
 }
 
 body {
@@ -252,7 +469,7 @@ body {
         color: #FFFFFF;
     }
     .success-message {
-        color: #FFFFFF;
+        color: #a8e6cf;
     }
     .slider-container label {
         color: #FFFFFF;
@@ -260,14 +477,24 @@ body {
 }
 
 @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 @keyframes pulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-    100% { transform: scale(1); }
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+    100% {
+        transform: scale(1);
+    }
 }
 
 /* Стили для спиннера загрузки */
@@ -278,223 +505,41 @@ body {
     border-radius: 50%;
     border-top-color: #00FFFF;
     border-left-color: #00FFFF;
-    animation: spin 1s linear infinite;
-    margin: 20px auto;
-    display: none; /* Скрыт по умолчанию */
-}
-
-.loading-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(18, 18, 18, 0.9);
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    color: #FFFFFF;
-}
-
-.loading-overlay.active {
-    opacity: 1;
-}
-
-.loading-overlay h2 {
-    font-size: clamp(24px, 4vw, 32px);
-    margin-bottom: 20px;
-    text-shadow: 0 0 8px rgba(0, 212, 255, 0.5);
-    color: #00D4FF;
-    font-weight: 600;
-}
-
-.loading-spinner {
-    width: 60px;
-    height: 60px;
-    border: 6px solid rgba(0, 0, 0, 0.1);
-    border-radius: 50%;
-    border-top-color: #00FFFF;
-    border-left-color: #00FFFF;
-    animation: spin 1s linear infinite;
+    animation: spin 1s ease-in-out infinite;
     margin: 20px auto;
     display: block;
+    opacity: 0;
+    transition: all 0.5s ease-out;
+    box-shadow: 0 0 0 5px rgba(0, 255, 255, 0.5);
 }
 
-/* Стили для кнопки при загрузке */
-button#start-visualization-btn.loading {
-    animation: none !important;
-    opacity: 0.6;
-    cursor: not-allowed;
-    pointer-events: none;
-    position: relative;
-    overflow: hidden;
+footer p {
+    font-size: 12px;
+    color: #ADB5BD;
+    margin: 0;
+    padding: 0 20px;
 }
 
-button#start-visualization-btn.loading::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 20px;
-    height: 20px;
-    margin: -10px 0 0 -10px;
-    border: 2px solid rgba(255, 255, 255, 0.3);
-    border-top-color: #00FFFF;
-    border-left-color: #00FFFF;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    z-index: 10;
-}
-
-@media (max-width: 1024px) {
-    .container {
-        max-width: 700px;
-    }
-    button {
-        font-size: 15px;
-    }
-    .success-message {
-        font-size: clamp(16px, 3vw, 20px);
-    }
-}
-
+/* Адаптивность для мобильных устройств */
 @media (max-width: 768px) {
     .container {
-        max-width: 600px;
         padding: 20px 15px;
     }
     button {
+        padding: 10px 20px;
         font-size: 14px;
-        padding: 12px 20px;
     }
-    .fixed-buttons button {
-        width: 90%;
-    }
-    .success-message {
-        font-size: clamp(16px, 3vw, 18px);
-    }
-}
-
-@media (max-width: 480px) {
-    .container {
-        max-width: 100%;
-        width: 95%;
-        padding: 15px 10px;
-    }
-    button {
-        font-size: 13px;
-        padding: 10px 16px;
-    }
-    .fixed-buttons button {
-        width: 100%;
-    }
-    .success-message {
-        font-size: clamp(14px, 4vw, 16px);
-        padding: 8px 12px;
-    }
-    #loading h1 {
-        font-size: clamp(20px, 5vw, 28px);
-    }
-}
-
-/* Слайдеры и параметры */
-.slider-container {
-    margin: 20px 0;
-    width: 100%;
-    max-width: 400px;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-.slider-container label {
-    display: block;
-    margin-bottom: 8px;
-    color: #FFFFFF;
-    font-weight: 500;
-    font-size: 16px;
-}
-
-.slider-container input[type="range"] {
-    width: 100%;
-    height: 8px;
-    -webkit-appearance: none;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 4px;
-    outline: none;
-}
-
-.slider-container input[type="range"]::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    width: 20px;
-    height: 20px;
-    background: #00D4FF;
-    border-radius: 50%;
-    cursor: pointer;
-    box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.5);
-    transition: all 0.2s ease;
-}
-
-.slider-container input[type="range"]::-webkit-slider-thumb:hover {
-    transform: scale(1.2);
-    box-shadow: 0 0 0 5px rgba(0, 212, 255, 0.8);
-}
-
-.slider-container .value {
-    text-align: center;
-    margin-top: 8px;
-    color: #00D4FF;
-    font-weight: bold;
-    font-size: 18px;
-}
-
-/* Стили для футера */
-footer {
-    text-align: center;
-    padding: 20px 0;
-    color: rgba(255, 255, 255, 0.7);
-    font-size: 14px;
-    margin-top: 40px;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-/* Адаптивность для кнопок и слайдеров */
-@media (max-width: 768px) {
     .fixed-buttons {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 10px;
+        margin-top: 15px;
     }
-    
-    .fixed-buttons button {
-        width: 80%;
-        margin: 8px 0;
-    }
-    
-    .slider-container {
-        width: 100%;
-        margin: 15px 0;
-    }
-    
-    .slider-container label {
-        font-size: 14px;
-    }
-}
-
-@media (max-width: 480px) {
-    .container {
-        padding: 15px 10px;
-    }
-    
     .success-message {
+        padding: 12px 16px;
         font-size: 16px;
     }
-    
+    #loading h1 {
+        font-size: clamp(24px, 6vw, 32px);
+    }
     footer p {
-        font-size: 12px;
+        font-size: 10px;
     }
 }

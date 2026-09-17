@@ -7,6 +7,9 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <button class="theme-toggle" aria-label="Toggle dark mode">
+        <span class="moon-icon" aria-hidden="true">☽</span>
+    </button>
     <div id="loading">
         <div class="container">
             <h1>Fractal Visualizer</h1>
@@ -22,24 +25,26 @@
         </div>
     </div>
     <div class="container" id="fractal-container">
-        <div class="success-message" id="success-message">Visualization complete!</div>
+        <div class="success-message" id="success-message" aria-live="polite">Visualization complete!</div>
         <div id="canvas-container">
             <canvas id="fractal-canvas"></canvas>
         </div>
+    </div>
+    <div class="controls-panel">
         <div class="slider-container">
             <label for="recursion-depth">Recursion Depth</label>
-            <input type="range" id="recursion-depth" min="1" max="10" value="5">
+            <input type="range" id="recursion-depth" min="1" max="10" value="5" role="slider" aria-valuemin="1" aria-valuemax="10" aria-valuenow="5" tabindex="0">
             <div class="value" id="recursion-depth-value">5</div>
         </div>
         <div class="slider-container">
             <label for="point-count">Point Count</label>
-            <input type="range" id="point-count" min="100" max="10000" value="1000">
+            <input type="range" id="point-count" min="100" max="10000" value="1000" role="slider" aria-valuemin="100" aria-valuemax="10000" aria-valuenow="1000" tabindex="0">
             <div class="value" id="point-count-value">1000</div>
         </div>
         <div class="fixed-buttons">
-            <button id="start-btn" class="fade-in">Start</button>
-            <button id="export-btn" class="fade-in">Export</button>
-            <button id="clear-btn" class="fade-in">Clear</button>
+            <button id="start-btn" class="fade-in" tabindex="0">Start</button>
+            <button id="export-btn" class="fade-in" tabindex="0">Export</button>
+            <button id="clear-btn" class="fade-in" tabindex="0">Clear</button>
         </div>
     </div>
     <script src="script.js"></script>

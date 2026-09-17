@@ -1,40 +1,42 @@
 .loading-spinner {
-    width: 80px;
-    height: 80px;
-    border: 6px solid rgba(0, 0, 0, 0.1);
+    width: 40px;
+    height: 40px;
+    border: 8px solid rgba(0, 0, 0, 0.1);
     border-radius: 50%;
-    border-top-color: white;
+    border-top-color: #00FFFF;
+    border-left-color: #00FFFF;
     animation: spin 1s ease-in-out infinite;
     margin: 20px auto;
     display: block;
     opacity: 0;
-    transition: all 0.5s ease-in-out;
-    box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.5);
+    transition: all 0.5s ease-out;
+    box-shadow: 0 0 0 5px rgba(0, 255, 255, 0.5);
 }
 
 .loading-message {
     text-align: center;
     margin-top: 20px;
-    color: white;
+    color: #FFFFFF;
     font-size: clamp(16px, 3vw, 20px);
     font-weight: 500;
     opacity: 0;
-    transition: opacity 0.5s ease-in-out;
+    transition: opacity 0.5s ease-out;
 }
 
 .loading-spinner:hover {
     transform: scale(1.1);
-    box-shadow: 0 0 0 6px rgba(74, 144, 226, 0.7);
+    box-shadow: 0 0 0 8px rgba(0, 255, 255, 0.8);
 }
 
 #loading {
-    padding-top: 80px;
+    padding-top: 60px;
 }
 
 #loading h1 {
-    font-size: clamp(24px, 5vw, 32px);
+    font-size: clamp(28px, 5vw, 40px);
     margin-bottom: 1.5rem;
-    text-shadow: 0 0 5px rgba(74, 144, 226, 0.5);
+    text-shadow: 0 0 8px rgba(0, 212, 255, 0.5);
+    color: #00D4FF;
 }
 
 #loading .container {
@@ -44,18 +46,61 @@
 #progress-container {
     margin-top: 1.5rem;
     margin-bottom: 2rem;
+    width: 100%;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.progress-bar {
+    height: 12px;
+    background-color: #333;
+    border-radius: 6px;
+    overflow: hidden;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.progress {
+    height: 100%;
+    background: linear-gradient(90deg, #00FFFF, #00BFFF);
+    width: 0%;
+    transition: width 0.3s ease;
+    position: relative;
+}
+
+.progress::after {
+    content: "";
+    position: absolute;
+    top: -8px;
+    left: 0;
+    width: 100%;
+    height: 16px;
+    background: linear-gradient(90deg, #00FFFF, #00BFFF);
+    border-radius: 6px;
+    z-index: -1;
+}
+
+.indicator {
+    width: 24px;
+    height: 4px;
+    background-color: #00FFFF;
+    margin: 10px auto 0;
+    transition: transform 0.3s ease;
+    position: relative;
+    top: 10px;
+    box-shadow: 0 0 0 3px rgba(0, 255, 255, 0.4);
 }
 
 button {
-    padding: 12px 24px;
-    margin: 10px 0;
+    padding: 14px 28px;
+    margin: 12px 0;
     border: none;
     border-radius: 8px;
-    background-color: #4a90e2;
-    color: white;
+    background-color: #00D4FF;
+    color: #121212;
     cursor: pointer;
     font-size: 16px;
-    font-weight: 500;
+    font-weight: 600;
     transition: all 0.3s ease;
     opacity: 0;
     transform: translateY(10px);
@@ -64,23 +109,24 @@ button {
     max-width: 300px;
     margin-left: auto;
     margin-right: auto;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 6px rgba(0, 212, 255, 0.3);
+    border: 1px solid rgba(0, 212, 255, 0.5);
 }
 
 button:hover {
-    background-color: #357abd;
+    background-color: #00B8FF;
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 10px rgba(0, 184, 255, 0.4);
 }
 
 button.active {
-    background-color: #e74c3c;
+    background-color: #FF6B6B;
     transform: translateY(-4px);
-    box-shadow: 0 6px 12px rgba(231, 76, 60, 0.3);
+    box-shadow: 0 6px 12px rgba(255, 107, 107, 0.4);
 }
 
 button:focus {
-    outline: 2px solid #fff;
+    outline: 2px solid #00FFFF;
     outline-offset: 2px;
 }
 
@@ -89,7 +135,7 @@ button:active {
 }
 
 button#start-visualization-btn {
-    background: linear-gradient(135deg, #38bdf8, #93c5fd);
+    background-color: #00BFFF;
     animation: pulse 1.5s infinite;
     transform-origin: center;
 }
@@ -97,47 +143,24 @@ button#start-visualization-btn {
 button#start-visualization-btn:hover {
     transform: scale(1.05);
     animation: none;
-    box-shadow: 0 6px 12px rgba(56, 189, 248, 0.5);
+    box-shadow: 0 6px 12px rgba(0, 255, 255, 0.5);
 }
 
 button#start-visualization-btn:active {
     transform: scale(0.98);
 }
 
-.indicator {
-    width: 20px;
-    height: 4px;
-    background-color: #4a90e2;
-    margin: 10px auto 0;
-    transition: transform 0.3s ease;
-    position: relative;
-    top: 10px;
-}
-
-body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    background-color: #f5f5f5;
-}
-
-.container {
-    text-align: center;
-    width: 90%;
-    max-width: 500px;
-    padding: 20px 0;
-}
-
 .success-message {
-    color: #2ecc71;
-    font-size: 24px;
+    color: #FFFFFF;
+    font-size: clamp(18px, 3vw, 24px);
     margin-bottom: 20px;
     opacity: 0;
-    animation: fadeIn 1s ease-in-out forwards;
+    animation: fadeIn 1s ease-out forwards;
+    padding: 10px 20px;
+    background-color: rgba(0, 255, 0, 0.1);
+    border-radius: 8px;
+    display: inline-block;
+    border: 1px solid rgba(46, 204, 113, 0.3);
 }
 
 @keyframes fadeIn {
@@ -163,33 +186,82 @@ button.fade-in:nth-child(3) {
 
 .fixed-buttons button {
     width: 80%;
-    margin: 8px 0;
+    margin: 10px auto;
     padding: 10px;
     font-size: 14px;
 }
 
-.fixed-buttons .indicator {
-    width: 16px;
-    height: 3px;
+.fixed-buttons button + button {
+    margin-top: 10px;
+}
+
+body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #121212;
+    color: #FFFFFF;
+}
+
+.container {
+    text-align: center;
+    width: 90%;
+    max-width: 800px;
+    padding: 30px 20px;
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    color: #FFFFFF;
 }
 
 @media (prefers-color-scheme: dark) {
     body {
-        background-color: #222;
-        color: #fff;
+        background-color: #121212;
+        color: #FFFFFF;
+    }
+    .container {
+        background-color: rgba(18, 18, 18, 0.8);
     }
     button {
         background-color: #3498db;
+        border: 1px solid rgba(52, 152, 219, 0.5);
+        color: #121212;
     }
     button:hover {
         background-color: #2980b9;
+        color: #121212;
     }
     button.active {
         background-color: #e74c3c;
+        color: #FFFFFF;
     }
     .indicator {
         background-color: #e74c3c;
     }
+    .progress {
+        background: linear-gradient(90deg, #3498db, #2980b9);
+    }
+    .progress::after {
+        background: linear-gradient(90deg, #3498db, #2980b9);
+    }
+    .loading-message {
+        color: #FFFFFF;
+    }
+    .success-message {
+        color: #FFFFFF;
+    }
+    .slider-container label {
+        color: #FFFFFF;
+    }
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
 
 @keyframes pulse {
@@ -198,23 +270,231 @@ button.fade-in:nth-child(3) {
     100% { transform: scale(1); }
 }
 
+/* Стили для спиннера загрузки */
+.loading-spinner {
+    width: 60px;
+    height: 60px;
+    border: 6px solid rgba(0, 0, 0, 0.1);
+    border-radius: 50%;
+    border-top-color: #00FFFF;
+    border-left-color: #00FFFF;
+    animation: spin 1s linear infinite;
+    margin: 20px auto;
+    display: none; /* Скрыт по умолчанию */
+}
+
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(18, 18, 18, 0.9);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    color: #FFFFFF;
+}
+
+.loading-overlay.active {
+    opacity: 1;
+}
+
+.loading-overlay h2 {
+    font-size: clamp(24px, 4vw, 32px);
+    margin-bottom: 20px;
+    text-shadow: 0 0 8px rgba(0, 212, 255, 0.5);
+    color: #00D4FF;
+    font-weight: 600;
+}
+
+.loading-spinner {
+    width: 60px;
+    height: 60px;
+    border: 6px solid rgba(0, 0, 0, 0.1);
+    border-radius: 50%;
+    border-top-color: #00FFFF;
+    border-left-color: #00FFFF;
+    animation: spin 1s linear infinite;
+    margin: 20px auto;
+    display: block;
+}
+
+/* Стили для кнопки при загрузке */
+button#start-visualization-btn.loading {
+    animation: none !important;
+    opacity: 0.6;
+    cursor: not-allowed;
+    pointer-events: none;
+    position: relative;
+    overflow: hidden;
+}
+
+button#start-visualization-btn.loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: #00FFFF;
+    border-left-color: #00FFFF;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    z-index: 10;
+}
+
+@media (max-width: 1024px) {
+    .container {
+        max-width: 700px;
+    }
+    button {
+        font-size: 15px;
+    }
+    .success-message {
+        font-size: clamp(16px, 3vw, 20px);
+    }
+}
+
 @media (max-width: 768px) {
+    .container {
+        max-width: 600px;
+        padding: 20px 15px;
+    }
     button {
         font-size: 14px;
-        padding: 10px;
-        margin: 8px 0;
+        padding: 12px 20px;
     }
     .fixed-buttons button {
         width: 90%;
     }
+    .success-message {
+        font-size: clamp(16px, 3vw, 18px);
+    }
 }
 
 @media (max-width: 480px) {
+    .container {
+        max-width: 100%;
+        width: 95%;
+        padding: 15px 10px;
+    }
     button {
-        font-size: 12px;
-        padding: 8px;
+        font-size: 13px;
+        padding: 10px 16px;
     }
     .fixed-buttons button {
         width: 100%;
+    }
+    .success-message {
+        font-size: clamp(14px, 4vw, 16px);
+        padding: 8px 12px;
+    }
+    #loading h1 {
+        font-size: clamp(20px, 5vw, 28px);
+    }
+}
+
+/* Слайдеры и параметры */
+.slider-container {
+    margin: 20px 0;
+    width: 100%;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.slider-container label {
+    display: block;
+    margin-bottom: 8px;
+    color: #FFFFFF;
+    font-weight: 500;
+    font-size: 16px;
+}
+
+.slider-container input[type="range"] {
+    width: 100%;
+    height: 8px;
+    -webkit-appearance: none;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    outline: none;
+}
+
+.slider-container input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 20px;
+    height: 20px;
+    background: #00D4FF;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.5);
+    transition: all 0.2s ease;
+}
+
+.slider-container input[type="range"]::-webkit-slider-thumb:hover {
+    transform: scale(1.2);
+    box-shadow: 0 0 0 5px rgba(0, 212, 255, 0.8);
+}
+
+.slider-container .value {
+    text-align: center;
+    margin-top: 8px;
+    color: #00D4FF;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+/* Стили для футера */
+footer {
+    text-align: center;
+    padding: 20px 0;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 14px;
+    margin-top: 40px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Адаптивность для кнопок и слайдеров */
+@media (max-width: 768px) {
+    .fixed-buttons {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .fixed-buttons button {
+        width: 80%;
+        margin: 8px 0;
+    }
+    
+    .slider-container {
+        width: 100%;
+        margin: 15px 0;
+    }
+    
+    .slider-container label {
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 480px) {
+    .container {
+        padding: 15px 10px;
+    }
+    
+    .success-message {
+        font-size: 16px;
+    }
+    
+    footer p {
+        font-size: 12px;
     }
 }
